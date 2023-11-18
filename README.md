@@ -287,81 +287,81 @@ Type: Float
 Default Value: 0.1  
 Usage Context: Similar to attention dropout, useful for regularization.  
 
-32. --resid_dropout_rate
-Description: Dropout rate for residual layers.
-Type: Float
-Default Value: 0.1
-Usage Context: Controls regularization in residual connections, useful for larger networks.
+32. --resid_dropout_rate  
+Description: Dropout rate for residual layers.  
+Type: Float  
+Default Value: 0.1  
+Usage Context: Controls regularization in residual connections, useful for larger networks.  
 
-33. --predictor_dataset_path
-Description: File path for the dataset used by the Property Predictor.
-Type: String
-Default Value: './data/csvs/bs1.csv'
-Usage Context: Change to point to a different dataset as needed for custom predictions.
+33. --predictor_dataset_path  
+Description: File path for the dataset used by the Property Predictor.  
+Type: String  
+Default Value: './data/csvs/bs1.csv'  
+Usage Context: Change to point to a different dataset as needed for custom predictions.  
 
-34. --predictor_tokenizer_path
-Description: Path to the tokenizer used by the Property Predictor.
-Type: String
-Default Value: './data/tokenizers/predictor_tokenizer.json'
-Usage Context: Update to use a different tokenizer according to the dataset characteristics.
+34. --predictor_tokenizer_path  
+Description: Path to the tokenizer used by the Property Predictor.  
+Type: String  
+Default Value: './data/tokenizers/predictor_tokenizer.json'  
+Usage Context: Update to use a different tokenizer according to the dataset characteristics.  
 
-35. --predictor_save_path
-Description: Where to save the trained Property Predictor model.
-Type: String
-Default Value: './data/models/predictor_model.pt'
-Usage Context: Modify to specify a different saving location or naming convention for the Property Predictor model.
+35. --predictor_save_path  
+Description: Where to save the trained Property Predictor model.  
+Type: String  
+Default Value: './data/models/predictor_model.pt'  
+Usage Context: Modify to specify a different saving location or naming convention for the Property Predictor model.  
 
-36. --train_predictor
-Description: Flag to train the Property Predictor.
-Action: Store True
-Default Value: False (not specified)
-Usage Context: Set this flag if training a Property Predictor model is required.
+36. --train_predictor  
+Description: Flag to train the Property Predictor.  
+Action: Store True  
+Default Value: False (not specified)  
+Usage Context: Set this flag if training a Property Predictor model is required.  
 
-37. --predictor_batch_size
-Description: Batch size for training the Property Predictor.
-Type: Integer
-Default Value: 32
-Usage Context: Adjust based on available memory and desired training speed.
+37. --predictor_batch_size  
+Description: Batch size for training the Property Predictor.  
+Type: Integer  
+Default Value: 32  
+Usage Context: Adjust based on available memory and desired training speed.  
 
-38. --predictor_epochs
-Description: Number of training epochs for the Property Predictor.
-Type: Integer
-Default Value: 10
-Usage Context: Increase to train the Property Predictor for more iterations, potentially improving its performance.
+38. --predictor_epochs  
+Description: Number of training epochs for the Property Predictor.  
+Type: Integer  
+Default Value: 10  
+Usage Context: Increase to train the Property Predictor for more iterations, potentially improving its performance.  
 
 39. --predictor_n_embd, --predictor_d_model, --predictor_n_layers, --predictor_num_heads, --predictor_block_size, --predictor_proj_size, --predictor_attn_dropout_rate, --predictor_proj_dropout_rate, --predictor_resid_dropout_rate
-Description: These arguments mirror the earlier n_embd, d_model, n_layers, num_heads, block_size, proj_size, attn_dropout_rate, proj_dropout_rate, resid_dropout_rate but specifically for the Property Predictor model.
-Usage Context: Adjust these parameters to customize the architecture and training of the Property Predictor model.
+Description: These arguments mirror the earlier n_embd, d_model, n_layers, num_heads, block_size, proj_size, attn_dropout_rate, proj_dropout_rate, resid_dropout_rate but specifically for the Property Predictor model.  
+Usage Context: Adjust these parameters to customize the architecture and training of the Property Predictor model.  
 
-40. --dataset_path
-Description: Path to the dataset for language modeling.
-Type: String
-Default Value: './data/gdb/gdb13/gdb13.smi'
-Usage Context: Change to use a different dataset for training the language model.
+40. --dataset_path  
+Description: Path to the dataset for language modeling.  
+Type: String  
+Default Value: './data/gdb/gdb13/gdb13.smi'  
+Usage Context: Change to use a different dataset for training the language model.  
 
-41. --tokenizer_path
-Description: Path to the tokenizer.
-Type: String
-Default Value: './data/tokenizers/gdb13ScaffoldCharTokenizer.json'
-Usage Context: Update to use a different tokenizer if necessary, based on the specific dataset or desired tokenization method.
+41. --tokenizer_path  
+Description: Path to the tokenizer.  
+Type: String  
+Default Value: './data/tokenizers/gdb13ScaffoldCharTokenizer.json'  
+Usage Context: Update to use a different tokenizer if necessary, based on the specific dataset or desired tokenization method.  
 
-42. --device
-Description: Specifies the computing device to be used ('cuda' for GPU, 'cpu' for CPU).
-Type: String
-Default Value: 'cuda'
-Usage Context: Set to 'cpu' if GPU is not available or desired for computation.
+42. --device  
+Description: Specifies the computing device to be used ('cuda' for GPU, 'cpu' for CPU).  
+Type: String  
+Default Value: 'cuda'  
+Usage Context: Set to 'cpu' if GPU is not available or desired for computation.  
 
-43. --model
-Description: Choice of model architecture.
-Type: Enum (defined by ModelOpt)
-Default Value: ModelOpt.GPT
-Usage Context: Select a different model architecture if required, based on the available options in ModelOpt.
+43. --model  
+Description: Choice of model architecture.  
+Type: Enum (defined by ModelOpt)  
+Default Value: ModelOpt.GPT  
+Usage Context: Select a different model architecture if required, based on the available options in ModelOpt.  
 
-44. --use_scaffold
-Description: Whether to use scaffold in the model.
-Action: Store True
-Default Value: False (not specified)
-Usage Context: Set this flag if incorporating scaffold is needed for the model's approach to molecular generation.
+44. --use_scaffold  
+Description: Whether to use scaffold in the model.  
+Action: Store True  
+Default Value: False (not specified)  
+Usage Context: Set this flag if incorporating scaffold is needed for the model's approach to molecular generation.  
 
 
 ## References and Acknowledgements

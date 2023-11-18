@@ -34,39 +34,44 @@ Note however that this command is designed for a very powerful system. Here's so
 #### Scenario 1: Basic Training on Limited Hardware
 Goal: Basic training with a small dataset on a machine with limited memory and no GPU.
 
-Command:
+```
 python chromogen.py --batch_size 128 --epochs 5 --learning_rate 0.005 --do_train --tokenizer Char --rl_batch_size 200 --rl_epochs 50 --rl_max_len 100 --rl_size 10000 --reward_fns ChromoGen --no_batched_rl --device cpu
+```
 
 #### Scenario 2: Advanced Training with GPU
 Goal: Advanced training with a larger dataset on a high-end machine with GPU.
 
-Command:
+```
 python chromogen.py --batch_size 1024 --epochs10  --learning_rate 0.001 --do_train --load_pretrained --pretrained_path './path/to/pretrained/model.pt' --tokenizer BPE --rl_batch_size 1000 --rl_epochs 200 --rl_max_len 150 --rl_size 50000 --reward_fns ChromoGen --device cuda
+```
 
 #### Scenario 3: Fine-Tuning a Pre-Trained Model
 Goal: Fine-tuning a pre-trained model on a standard workstation.
 
-Command:
+```
 python chromogen.py --batch_size 256 --epochs 3 --learning_rate 0.001 --load_pretrained --pretrained_path './path/to/pretrained/model.pt' --do_train --tokenizer Char --rl_batch_size 500 --rl_epochs 100 --rl_max_len 150 --rl_size 25000 --reward_fns ChromoGen --do_eval --eval_steps 5 --device cuda
+```
 
 #### Scenario 4: Evaluating Model Performance
 Goal: Evaluating the model's performance periodically during training.
 
-Command:
+```
 python chromogen.py --do_train --do_eval --eval_steps 10 --batch_size 512 --epochs 5 --learning_rate 0.002 --rl_batch_size 500 --rl_epochs 100 --rl_size 25000 --reward_fns ChromoGen --device cuda
+```
 
 #### Scenario 5: Custom Reward Function with Property Predictor
 Goal: Using a custom reward function with an external property predictor.
 
-Command:
+```
 python chromogen.py --batch_size 512 --epochs 7 --learning_rate 0.001 --do_train --tokenizer Char --rl_batch_size 500 --rl_epochs 120 --rl_max_len 150 --rl_size 30000 --reward_fns ['ChromoGen', 'QED'] --predictor_paths ['./path/to/predictor1.model', './path/to/predictor2.model'] --device cuda
+```
 
 #### Scenario 6: Training Property Predictor
 Goal: Training the Property Predictor model specifically.
 
-Command:
+```
 python chromogen.py --train_predictor --predictor_batch_size 64 --predictor_epochs 15 --predictor_dataset_path './path/to/dataset.csv' --predictor_save_path './path/to/save/predictor_model.pt' --device cpu
-
+```
 
 These examples show how to run the project with different configurations, tailored to the specific needs and resources of the user. Many more configurations are possible, and I would highly recommend reading up on all the options available.
 

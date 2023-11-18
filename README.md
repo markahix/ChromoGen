@@ -27,7 +27,9 @@ ChromoGen is an adapted version of the project [MolGen](https://github.com/eyalm
 ### Example Commands
 The command I use, that can be found in the ChromoGen.sh script:
 
+```
 python main.py --load_pretrained --pretrained_path ./data/models/gpt_pre_rl_gdb13.pt --do_eval --dataset_path ./data/gdb/gdb13/gdb13.smi --tokenizer Char --tokenizer_path ./data/tokenizers/gdb13ScaffoldCharTokenizer.json --rl_epochs 250 --rl_size 250000 --batch_size 256 
+```
 
 Note however that this command is designed for a very powerful system. Here's some more example commands:
 
@@ -97,193 +99,193 @@ To implement a custom reward function, users can define a new class in `reward_f
 
 ## Detailed Usage Guide
 The project can be configured and run using various command-line arguments defined in `utils.py`. Here is a detailed breakdown of all the arguments that can be passed:
-1. --batch_size
-Description: Sets the batch size for the language modeling task.
-Type: Integer
-Default Value: 512
-Usage Context: Increase or decrease based on the available memory and desired training speed. Larger batch sizes can speed up training but require more memory.
+1. --batch_size  
+Description: Sets the batch size for the language modeling task.  
+Type: Integer  
+Default Value: 512  
+Usage Context: Increase or decrease based on the available memory and desired training speed. Larger batch sizes can speed up training but require more memory.  
 
-2. --epochs
-Description: Specifies the number of training epochs for the language modeling task.
-Type: Integer
-Default Value: 3
-Usage Context: Increase to train the model for more iterations, which might improve performance but will take longer.
+2. --epochs  
+Description: Specifies the number of training epochs for the language modeling task.  
+Type: Integer  
+Default Value: 3  
+Usage Context: Increase to train the model for more iterations, which might improve performance but will take longer.  
 
-3. --learning_rate
-Description: Sets the learning rate for the model's optimization.
-Type: Float
-Default Value: 0.001 (1e-3)
-Usage Context: Adjust to fine-tune model training. Lower values can lead to more stable but slower convergence.
+3. --learning_rate  
+Description: Sets the learning rate for the model's optimization.  
+Type: Float  
+Default Value: 0.001 (1e-3)  
+Usage Context: Adjust to fine-tune model training. Lower values can lead to more stable but slower convergence.  
 
-4. --load_pretrained
-Description: Option to load a pre-trained model instead of training a new one.
-Action: Store True
-Default Value: False (not specified)
-Usage Context: Use when you want to leverage a pre-trained model to save time or improve performance.
+4. --load_pretrained  
+Description: Option to load a pre-trained model instead of training a new one.  
+Action: Store True  
+Default Value: False (not specified)  
+Usage Context: Use when you want to leverage a pre-trained model to save time or improve performance.  
 
-5. --do_train
-Description: Flag to train a model with the language modeling task.
-Action: Store True
-Default Value: False (not specified)
-Usage Context: Set this flag when you need to train the model from scratch or fine-tune it.
+5. --do_train  
+Description: Flag to train a model with the language modeling task.  
+Action: Store True  
+Default Value: False (not specified)  
+Usage Context: Set this flag when you need to train the model from scratch or fine-tune it.  
 
-6. --pretrained_path
-Description: File path to the pre-trained model.
-Type: String
-Default Value: './data/models/gpt_pre_rl_gdb13.pt'
-Usage Context: Change this to point to a different pre-trained model file as needed.
+6. --pretrained_path  
+Description: File path to the pre-trained model.  
+Type: String  
+Default Value: './data/models/gpt_pre_rl_gdb13.pt'  
+Usage Context: Change this to point to a different pre-trained model file as needed.  
 
-7. --tokenizer
-Description: Specifies the type of tokenizer to use.
-Type: String
-Default Value: 'Char'
-Choices: ['Char', 'BPE']
-Usage Context: Choose 'BPE' for Byte Pair Encoding tokenizer if preferred, which might be more efficient for certain languages.
+7. --tokenizer  
+Description: Specifies the type of tokenizer to use.  
+Type: String  
+Default Value: 'Char'  
+Choices: ['Char', 'BPE']  
+Usage Context: Choose 'BPE' for Byte Pair Encoding tokenizer if preferred, which might be more efficient for certain languages.  
 
-8. --rl_batch_size
-Description: Sets the number of episodes to compute a batch for policy gradient during RL training.
-Type: Integer
-Default Value: 500
-Usage Context: Modify based on computational resources and the desired balance between exploration and learning efficiency.
+8. --rl_batch_size  
+Description: Sets the number of episodes to compute a batch for policy gradient during RL training.  
+Type: Integer  
+Default Value: 500  
+Usage Context: Modify based on computational resources and the desired balance between exploration and learning efficiency.  
 
-9. --rl_epochs
-Description: Number of epochs to run for the policy gradient stage in RL.
-Type: Integer
-Default Value: 100
-Usage Context: Increase for more thorough training at the expense of longer training time.
+9. --rl_epochs  
+Description: Number of epochs to run for the policy gradient stage in RL.  
+Type: Integer  
+Default Value: 100  
+Usage Context: Increase for more thorough training at the expense of longer training time.  
 
-10. --discount_factor
-Description: Discount factor for future rewards in RL.
-Type: Float
-Default Value: 0.99
-Usage Context: Adjust to change the emphasis between immediate and future rewards. Higher values prioritize future rewards.
+10. --discount_factor  
+Description: Discount factor for future rewards in RL.  
+Type: Float  
+Default Value: 0.99  
+Usage Context: Adjust to change the emphasis between immediate and future rewards. Higher values prioritize future rewards.  
 
-11. --rl_max_len
-Description: Maximum size of molecule the model can generate during the RL stage.
-Type: Integer
-Default Value: 150
-Usage Context: Set according to the maximum expected molecular size. Increasing this may allow generation of larger molecules but could increase complexity.
+11. --rl_max_len  
+Description: Maximum size of molecule the model can generate during the RL stage.  
+Type: Integer  
+Default Value: 150  
+Usage Context: Set according to the maximum expected molecular size. Increasing this may allow generation of larger molecules but could increase complexity.  
 
-12. --rl_size
-Description: Number of molecules to generate at each evaluation step during RL.
-Type: Integer
-Default Value: 25000
-Usage Context: Adjust based on computational resources and how exhaustive you want the evaluation to be.
+12. --rl_size  
+Description: Number of molecules to generate at each evaluation step during RL.  
+Type: Integer  
+Default Value: 25000  
+Usage Context: Adjust based on computational resources and how exhaustive you want the evaluation to be.  
 
-13. --reward_fns
-Description: Reward functions used during the RL stage.
-Type: String List
-Default Value: ['ChromoGen']
-Choices: ['QED', 'Sim', 'Anti Cancer', 'LIDI', 'Docking', 'ChromoGen']
-Usage Context: Select different reward functions based on the desired properties of the generated molecules.
+13. --reward_fns  
+Description: Reward functions used during the RL stage.  
+Type: String List  
+Default Value: ['ChromoGen']  
+Choices: ['QED', 'Sim', 'Anti Cancer', 'LIDI', 'Docking', 'ChromoGen']  
+Usage Context: Select different reward functions based on the desired properties of the generated molecules.  
 
-14. --do_eval
-Description: Flag to evaluate the model during the RL stage.
-Action: Store True
-Default Value: False (not specified)
-Usage Context: Set this flag when you want to periodically evaluate the model's performance during training.
+14. --do_eval  
+Description: Flag to evaluate the model during the RL stage.  
+Action: Store True  
+Default Value: False (not specified)  
+Usage Context: Set this flag when you want to periodically evaluate the model's performance during training.  
 
-15. --eval_steps
-Description: Frequency of evaluation steps during the RL stage.
-Type: Integer
-Default Value: 10
-Usage Context: Decrease to evaluate more frequently, which can provide more granular feedback but may slow down overall training.
+15. --eval_steps  
+Description: Frequency of evaluation steps during the RL stage.  
+Type: Integer  
+Default Value: 10  
+Usage Context: Decrease to evaluate more frequently, which can provide more granular feedback but may slow down overall training.  
 
-16. --rl_temprature
-Description: Temperature parameter during the RL stage.
-Type: Float
-Default Value: 1
-Usage Context: Adjust to control the randomness in the policy distribution. Higher values result in more exploration.
+16. --rl_temprature  
+Description: Temperature parameter during the RL stage.  
+Type: Float  
+Default Value: 1  
+Usage Context: Adjust to control the randomness in the policy distribution. Higher values result in more exploration.  
 
-17. --multipliers
-Description: Multipliers for the Property Predictor reward function.
-Type: String List
-Default Value: ["lambda x: x"]
-Usage Context: Modify to change the influence of different properties on the reward function.
+17. --multipliers  
+Description: Multipliers for the Property Predictor reward function.  
+Type: String List  
+Default Value: ["lambda x: x"]  
+Usage Context: Modify to change the influence of different properties on the reward function.  
 
-18. --no_batched_rl
-Description: Option to train the RL model without generating batches.
-Action: Store True
-Default Value: False (not specified)
-Usage Context: Use this flag to train the RL model in a non-batched manner, which may be necessary for certain computational setups.
+18. --no_batched_rl  
+Description: Option to train the RL model without generating batches.  
+Action: Store True  
+Default Value: False (not specified)  
+Usage Context: Use this flag to train the RL model in a non-batched manner, which may be necessary for certain computational setups.  
 
-19. --predictor_paths
-Description: File paths for the Property Predictor reward function.
-Type: String List
-Default Value: [None]
-Usage Context: Specify the paths to the predictor models if using custom reward functions based on external property predictors.
+19. --predictor_paths  
+Description: File paths for the Property Predictor reward function.  
+Type: String List  
+Default Value: [None]  
+Usage Context: Specify the paths to the predictor models if using custom reward functions based on external property predictors.  
 
-20. --save_path
-Description: Path where the results will be saved.
-Type: String
-Default Value: './data/results/[current_datetime]'
-Usage Context: Change to specify a different directory or naming convention for saving results.
+20. --save_path  
+Description: Path where the results will be saved.  
+Type: String  
+Default Value: './data/results/[current_datetime]'  
+Usage Context: Change to specify a different directory or naming convention for saving results.  
 
-21. --eval_size
-Description: Number of molecules to generate during the final evaluation.
-Type: Integer
-Default Value: 25000
-Usage Context: Adjust based on how comprehensive the final evaluation should be.
+21. --eval_size  
+Description: Number of molecules to generate during the final evaluation.  
+Type: Integer  
+Default Value: 25000  
+Usage Context: Adjust based on how comprehensive the final evaluation should be.  
 
-22. --eval_max_len
-Description: Maximum size of molecule the model can generate during the final evaluation stage.
-Type: Integer
-Default Value: 150
-Usage Context: Set based on the desired complexity or size of the molecules in the final evaluation.
+22. --eval_max_len  
+Description: Maximum size of molecule the model can generate during the final evaluation stage.  
+Type: Integer  
+Default Value: 150  
+Usage Context: Set based on the desired complexity or size of the molecules in the final evaluation.  
 
-23. --temprature
-Description: Softmax temperature during the final evaluation.
-Type: Float
-Default Value: 1
-Usage Context: Adjust to control the randomness in the final evaluation phase.
+23. --temprature  
+Description: Softmax temperature during the final evaluation.  
+Type: Float  
+Default Value: 1  
+Usage Context: Adjust to control the randomness in the final evaluation phase.  
 
-24. --n_embd
-Description: Model embedding size.
-Type: Integer
-Default Value: 512
-Usage Context: Increase for potentially richer representations, with a trade-off in computational demand.
+24. --n_embd  
+Description: Model embedding size.  
+Type: Integer  
+Default Value: 512  
+Usage Context: Increase for potentially richer representations, with a trade-off in computational demand.  
 
-25. --d_model
-Description: Size of the feedforward network model.
-Type: Integer
-Default Value: 1024
-Usage Context: Modify based on the desired complexity of the model's internal representations.
+25. --d_model  
+Description: Size of the feedforward network model.  
+Type: Integer  
+Default Value: 1024  
+Usage Context: Modify based on the desired complexity of the model's internal representations.  
 
-26. --n_layers
-Description: Number of LSTM/decoder layers.
-Type: Integer
-Default Value: 4
-Usage Context: Adjust to increase or decrease model depth, affecting its ability to learn complex patterns.
+26. --n_layers  
+Description: Number of LSTM/decoder layers.  
+Type: Integer  
+Default Value: 4  
+Usage Context: Adjust to increase or decrease model depth, affecting its ability to learn complex patterns.  
 
-27. --num_heads
-Description: Number of attention heads in the transformer model.
-Type: Integer
-Default Value: 8
-Usage Context: More heads allow the model to attend to different parts of the input simultaneously, potentially improving learning.
+27. --num_heads  
+Description: Number of attention heads in the transformer model.  
+Type: Integer  
+Default Value: 8  
+Usage Context: More heads allow the model to attend to different parts of the input simultaneously, potentially improving learning.  
 
-28. --block_size
-Description: Maximum length of token sequence for the model.
-Type: Integer
-Default Value: 512
-Usage Context: Increase if dealing with longer sequences, but be mindful of memory constraints.
+28. --block_size  
+Description: Maximum length of token sequence for the model.  
+Type: Integer  
+Default Value: 512  
+Usage Context: Increase if dealing with longer sequences, but be mindful of memory constraints.  
 
-29. --proj_size
-Description: Projection size for the attention mechanism.
-Type: Integer
-Default Value: 256
-Usage Context: Tweak to adjust the dimensionality of attention outputs.
+29. --proj_size  
+Description: Projection size for the attention mechanism.  
+Type: Integer  
+Default Value: 256  
+Usage Context: Tweak to adjust the dimensionality of attention outputs.  
 
-30. --attn_dropout_rate
-Description: Dropout rate for attention layers.
-Type: Float
-Default Value: 0.1
-Usage Context: Adjust to prevent overfitting, especially with larger datasets or models.
+30. --attn_dropout_rate  
+Description: Dropout rate for attention layers.  
+Type: Float  
+Default Value: 0.1  
+Usage Context: Adjust to prevent overfitting, especially with larger datasets or models.  
 
-31. --proj_dropout_rate
-Description: Dropout rate for projection layers.
-Type: Float
-Default Value: 0.1
-Usage Context: Similar to attention dropout, useful for regularization.
+31. --proj_dropout_rate  
+Description: Dropout rate for projection layers.  
+Type: Float  
+Default Value: 0.1  
+Usage Context: Similar to attention dropout, useful for regularization.  
 
 32. --resid_dropout_rate
 Description: Dropout rate for residual layers.

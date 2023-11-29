@@ -1,4 +1,3 @@
-import os
 from typing import List, Dict
 
 from ..utils.mol_utils import get_molecule_scaffold

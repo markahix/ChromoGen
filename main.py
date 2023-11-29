@@ -1,14 +1,7 @@
-import copy
-from datetime import datetime
-import math
 import os
-import random
 import sys
 
-import numpy as np
 import pandas as pd
-from parso import parse
-import rdkit
 from rdkit import RDLogger
 RDLogger.DisableLog('rdApp.*')
 # lg = RDLogger.logger()
@@ -20,15 +13,14 @@ import torch
 from src.datasets.get_dataset import get_dataset
 from src.datasets.bs1_dataset import BS1Dataset
 from src.models.model_builder import get_model 
-from src.models.gpt import GPTValue
 from src.models.bert import Bert, BertConfig
 from src.tokenizers.CharTokenizer import CharTokenizer
 from src.tokenizers.BPETokenizer import BPETokenizer
 from src.train.train import Trainer, PredictorTrainer
-from src.train.evaluate import generate_smiles, generate_smiles_scaffolds, get_stats, gen_till_train
+from src.train.evaluate import generate_smiles, generate_smiles_scaffolds, get_stats
 from src.train.reinforcement import policy_gradients
 from src.utils.reward_fn import get_reward_fn
-from src.utils.utils import TaskOpt, get_max_smiles_len
+from src.utils.utils import get_max_smiles_len
 from src.utils.utils import parse_arguments
 
 torch.autograd.set_detect_anomaly(True)

@@ -1,4 +1,3 @@
-import os
 
 import torch
 
@@ -95,3 +94,4 @@ class PredictorTrainer():
             mse = self.criterion(torch.tensor(logits).float(), torch.tensor(labels).float()) 
 
             print(f'Epoch: {epoch + 1} Test MSE: {mse}')
+

@@ -1,8 +1,7 @@
 from abc import ABC, abstractmethod
 from collections import OrderedDict
 
-import math
-from typing import Callable, Optional, Union, List
+from typing import Callable, Optional, List
 
 import chemprop
 
@@ -15,7 +14,6 @@ from rdkit.Chem.QED import qed
 from rdkit import DataStructs
 from rdkit import RDLogger
 RDLogger.DisableLog('rdApp.*')
-import torch
 from tqdm.auto import tqdm
 from vina import Vina
 

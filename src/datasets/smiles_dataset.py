@@ -1,7 +1,5 @@
-from random import sample
 from typing import List, Dict
 
-from rdkit import Chem
 from rdkit.Chem.Scaffolds import MurckoScaffold
 import torch
 from torch.utils.data import Dataset

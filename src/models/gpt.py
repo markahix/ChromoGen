@@ -6,7 +6,6 @@ https://github.com/karpathy/minGPT/
 import numpy as np
 import torch
 from torch import nn
-from torch.nn.modules import padding
 
 from .layers import MultiheadAttention, DecoderOnlyBlock
 

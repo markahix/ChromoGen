@@ -1,6 +1,5 @@
 import argparse
 from datetime import datetime
-from email.policy import default
 from enum import Enum
 import os
 from typing import List
@@ -8,7 +7,7 @@ from typing import List
 import matplotlib.pyplot as plt
 import torch
 from torch.nn import functional as F
-from tqdm import tqdm, trange
+from tqdm import trange
 
 class ModelOpt(Enum):
 	RECURRENT = 1

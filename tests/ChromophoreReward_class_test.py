@@ -1,4 +1,3 @@
-import xgboost as xgb
 import numpy as np
 from rdkit import Chem
 from map4 import MAP4Calculator

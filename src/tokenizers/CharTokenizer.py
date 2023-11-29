@@ -1,8 +1,7 @@
 import json
 import os
-from typing import Dict, List, Union
+from typing import Dict, List
 
-from tqdm import tqdm
 
 
 class CharTokenizer():

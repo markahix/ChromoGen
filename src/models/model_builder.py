@@ -1,6 +1,4 @@
-from enum import Enum
 
-import torch.nn as nn
 from .recurrent import RecurrentConfig, RecurrentModel
 from .gpt import GPTConfig, GPT
 from .transformer import TransformerConfig, Transoformer

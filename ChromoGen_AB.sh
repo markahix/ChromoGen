@@ -21,11 +21,11 @@ then
     wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
     bash Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda
     rm Miniconda3-latest-Linux-x86_64.sh
-    echo "export PATH=\${PATH}:\${HOME}/miniconda/bin" >> \${HOME}/.bashrc
-    export PATH=\${PATH}:\${HOME}/miniconda/bin
+    echo "export PATH=\${PATH}:\${HOME}/miniconda/bin" >> $HOME/.bashrc
+    export PATH=${PATH}:${HOME}/miniconda/bin
     conda init bash
 else
-	source /wsu/home/gi/gi16/gi1632/.bashrc
+	source $HOME/.bashrc
 	#conda init bash
 fi
 
@@ -39,6 +39,7 @@ then
     echo "Conda environment ChromoGen exists"
 else
     echo "Conda environment not found"
+    conda env create --name ChromoGen --file=environment.yml
 	exit
 fi
 

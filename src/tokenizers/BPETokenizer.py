@@ -15,7 +15,7 @@ class BPETokenizer():
         self._vocab_size = vocab_size
 
         print(f'{tokenizer_path=}', f'{os.path.exists(tokenizer_path)=}')
-        if tokenizer_path and os.path.exists(tokenizer_path):
+        if all([tokenizer_path, os.path.exists(tokenizer_path)]):
             print('Loading Existing tokenizer')
             with open(tokenizer_path, 'r') as f:
                 data = json.load(f)
@@ -148,7 +148,7 @@ class BPETokenizer():
 
         pair_freqs = compute_pair_freqs(splits)
 
-        best_pair = ""
+        # best_pair = ""
         max_freq = None
 
         for pair, freq in pair_freqs.items():

@@ -1,4 +1,4 @@
-name: ChromoGen
+name: chromogen
 channels:
   - tmap
   - conda-forge
@@ -152,7 +152,7 @@ dependencies:
     - cloudpickle==2.0.0
     - colour==0.1.5
     - configparser==5.0.2
-    - ddc-pub==0.1
+    - ddc
     - debugpy==1.5.1
     - decorator==5.1.0
     - defusedxml==0.7.1
@@ -204,7 +204,6 @@ dependencies:
     - keras-preprocessing==1.1.2
     - lazy-object-proxy==1.6.0
     - llvmlite==0.41.1
-    - map4==1.0
     - markdown==3.3.4
     - markupsafe==2.1.3
     - matplotlib-inline==0.1.3
@@ -212,7 +211,7 @@ dependencies:
     - meeko==0.5.0
     - mhfp==1.9.6
     - mistune==0.8.4
-    - molsets==1.0
+    - molsets==0.1.0
     - molvecgen==0.1
     - mordred==1.2.0
     - more-itertools==10.1.0
@@ -322,4 +321,4 @@ dependencies:
     - yarl==1.7.2
     - yaspin==2.1.0
     - zc-lockfile==3.0.post1
-prefix: /wsu/home/gi/gi16/gi1632/.conda/envs/ChromoGen
+prefix: $HOME/.conda/envs/ChromoGen

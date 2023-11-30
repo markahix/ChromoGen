@@ -1,4 +1,3 @@
-
 from .recurrent import RecurrentConfig, RecurrentModel
 from .gpt import GPTConfig, GPT
 from .transformer import TransformerConfig, Transoformer

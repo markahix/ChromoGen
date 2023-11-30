@@ -9,7 +9,7 @@ from torch.utils.data import Dataset
 import numpy as np
 import pandas as pd
 from rdkit import Chem
-from rdkit.Chem import Draw
+from rdkit.Chem import Draw, QED
 from rdkit import RDLogger
 RDLogger.DisableLog('rdApp.*')
 
@@ -24,7 +24,7 @@ from ..utils.mol_utils import convert_to_molecules, filter_invalid_molecules
 def generate_smiles_scaffolds(model,
                               tokenizer,
                               scaffolds,
-                              temprature=1,
+                              temperature=1,
                               num_samples=10,
                               size: int=1000,
                               batch_size: int=100,
@@ -51,7 +51,7 @@ def generate_smiles_scaffolds(model,
         for batch in range(size // (batch_size * len(scaffolds_sample))):
 
             tokens = sample(model, encoding['input_ids'],
-                        batch_size, max_len, temprature, device,)
+                        batch_size, max_len, temperature, device,)
 
             tokens = tokens.tolist()
 
@@ -76,7 +76,7 @@ def generate_smiles_scaffolds(model,
 def generate_smiles_constrained(model,
                               tokenizer,
                               scaffolds,
-                              temprature=1,
+                              temperature=1,
                               num_samples=10,
                               size: int=1000,
                               batch_size: int=100,
@@ -97,7 +97,7 @@ def generate_smiles_constrained(model,
     for scaffold in scaffolds_sample:
         encoding = tokenizer('[BOS]' + scaffold + '[SEP]')
 
-        tokens = sample(model, encoding, batch_size, max_len, temprature, device)
+        tokens = sample(model, encoding, batch_size, max_len, temperature, device)
         tokens = tokens.tolist()
 
         for mol in tokens:
@@ -115,7 +115,7 @@ def generate_smiles_constrained(model,
 
 def generate_smiles(model,
                     tokenizer,
-                    temprature: int=1,
+                    temperature: int=1,
                     size: int=1000,
                     batch_size: int=100,
                     max_len:int=100,
@@ -134,7 +134,7 @@ def generate_smiles(model,
 
     
     for batch in trange(batches, disable=disable):
-        tokens = sample(model, [tokenizer.bos_token_id], batch_size, max_len, temprature, device)
+        tokens = sample(model, [tokenizer.bos_token_id], batch_size, max_len, temperature, device)
         tokens = tokens.tolist()
 
         for mol in tokens:
@@ -265,7 +265,7 @@ def get_top_k_mols(generated_molecules: List[Chem.rdchem.Mol],
                 if score_name != 'qed':
                     metrics[f'top {i+1} {name}'] = score[i]
 
-            metrics[f'top {i+1} qed'] = calc_qed(molecule)
+            metrics[f'top {i+1} qed'] = QED.qed(molecule)
             metrics[f'top {i+1} sas'] = calc_sas(molecule)
             metrics[f'top {i+1} len'] = len(smiles)
 
@@ -281,7 +281,7 @@ def get_top_k_mols(generated_molecules: List[Chem.rdchem.Mol],
             metrics[f'top_{i+1}_smiles'] = smiles
             if score_name != 'qed':
                 metrics[f'top {i+1} {score_name}'] = score
-            metrics[f'top {i+1} qed'] = calc_qed(molecule)
+            metrics[f'top {i+1} qed'] = QED.qed(molecule)
             metrics[f'top {i+1} sas'] = calc_sas(molecule)
             metrics[f'top {i+1} len'] = len(smiles)
 
@@ -318,7 +318,7 @@ def get_stats(train_set: Dataset,
 
     print('Calculating QED')
     generated_qed_values, generated_qed_stats = calc_set_stat(generated_molecules,
-                                                            calc_qed,
+                                                            QED.qed,
                                                             lst=False,
                                                             value_range=(0, 1),
                                                             desc='QED')

@@ -81,7 +81,7 @@ class Transoformer(nn.Module):
             return logits, {**enc_attnetions, **dec_attentions}
 
     def generate(self, initial_token, end_token, enc_inp, enc_padding_mask,
-                 temprature: int=1, max_len: int=100, device=torch.device('cuda')):
+                 temperature: int=1, max_len: int=100, device=torch.device('cuda')):
         tokens = [initial_token]
         next_token = -1
         enc_inp = torch.tensor([enc_inp]).to(device)

@@ -1,12 +1,8 @@
 import os
 import sys
-
 import pandas as pd
 from rdkit import RDLogger
 RDLogger.DisableLog('rdApp.*')
-# lg = RDLogger.logger()
-# lg.setLevel(RDLogger.CRITICAL)
-
 from sklearn.model_selection import train_test_split
 import torch
 
@@ -25,27 +21,50 @@ from src.utils.utils import parse_arguments
 
 torch.autograd.set_detect_anomaly(True)
 
-# set seeds
-# torch.manual_seed(0)
-# np.random.seed(0)
-# random.seed(0)
-
-def main():
-
+if __name__ == "__main__":
     args = parse_arguments()
-
     device = torch.device(args.device)
 
+    ### MAH - START
+    # If a dataset_path is given, checks to ensure the file at that location exists.  If it does not exist, and the desired file is known to use, it is downloaded from Zenodo and decompressed to the proper location.  This will ensure that the specific datasets need not be preinstalled, which will make it more streamlined on newer systems - only download the datasets that are actually being used.
+    if args.dataset_path:        
+        if not os.path.exists(args.dataset_path):
+            dataset_dirname = os.path.dirname(args.dataset_path)
+            dataset_filename = args.dataset_path.split("/")[-1]
+            _currdir=os.getcwd()
+            dataset_urls = {
+                "gdb13.smi":"https://zenodo.org/record/5172018/files/gdb13.tgz",
+                "GDB13_Subset-AB.smi":"https://zenodo.org/record/5172018/files/GDB13_Subset-AB.smi.gz",
+                "gdb13.1M.freq.ll.smi":"https://zenodo.org/record/5172018/files/gdb13.1M.freq.ll.smi.gz",
+            }
+            print(f"{args.dataset_path} dataset missing.")
+            if dataset_filename in [x for x in dataset_urls.keys()]:
+                os.chdir(dataset_dirname)
+                os.system(f"wget {dataset_urls[dataset_filename]} && gzip -d {dataset_filename}.gz")
+                os.chdir(_currdir)
+            else:
+                print("Unable to obtain dataset automatically.")
+
+    ### moved this if-elif-else block above args.train_predictor check, as 'tokenizer' must be defined before being used by the internals of train_predictor.
+    if args.tokenizer == "Char":
+        tokenizer = CharTokenizer(args.tokenizer_path, args.dataset_path)
+
+    elif args.tokenizer == "BPE":
+        tokenizer = BPETokenizer(args.tokenizer_path, args.dataset_path, vocab_size=500)
+
+    else:
+        raise ValueError("Tokenizer type not supported")
+    ### MAH - END
+                
     if args.train_predictor:
         bs1_data = pd.read_csv(args.predictor_dataset_path)
         train, test = train_test_split(bs1_data, test_size=0.2, random_state=42, shuffle=True,)
 
-        print(train.shape)
+        print("Shape of training data: ",train.shape) #Make print statement more clear.
         train.reset_index(inplace=True)
         test.reset_index(inplace=True)
 
-        predictor_tokenizer = CharTokenizer(args.predictor_toeknizer_path,
-                                            data_path='./data/ic50_smiles.smi')
+        predictor_tokenizer = CharTokenizer(args.predictor_tokenizer_path, data_path='./data/ic50_smiles.smi')
 
         train_dataset = BS1Dataset(train, predictor_tokenizer)
         test_dataset = BS1Dataset(test, predictor_tokenizer)
@@ -74,20 +93,10 @@ def main():
 
         torch.save(predictor_model, args.predictor_save_path)
 
-    print(args.device)
+    print("Device: ",args.device)
     
     max_smiles_len = get_max_smiles_len(args.dataset_path) + 50
-    #max_smiles_len = 256
     print(f'{max_smiles_len=}')
-
-    if args.tokenizer == "Char":
-        tokenizer = CharTokenizer(args.tokenizer_path, args.dataset_path)
-
-    elif args.tokenizer == "BPE":
-        tokenizer = BPETokenizer(args.tokenizer_path, args.dataset_path, vocab_size=500)
-
-    else:
-        raise ValueError("Tokenizer type not supported")
 
     dataset = get_dataset(data_path=args.dataset_path,
                           tokenizer=tokenizer,
@@ -155,14 +164,14 @@ def main():
         generated_smiles = generate_smiles_scaffolds(model=model,
                                                     tokenizer=tokenizer,
                                                     scaffolds=dataset.scaffolds,
-                                                    temprature=args.temprature,
+                                                    temperature=args.temperature,
                                                     size=args.eval_size,
                                                     max_len=args.eval_max_len,
                                                     device=device)
     else:
         generated_smiles = generate_smiles(model=model,
                                            tokenizer=tokenizer,
-                                           temprature=args.temprature,
+                                           temperature=args.temperature,
                                            size=args.eval_size,
                                            max_len=args.eval_max_len,
                                            device=device)
@@ -191,7 +200,7 @@ def main():
                     scaffolds=dataset.scaffolds if args.use_scaffold else [],
                     eval_steps=args.eval_steps,
                     save_path=eval_save_path,
-                    temprature=args.rl_temprature,
+                    temperature=args.rl_temperature,
                     size=args.rl_size,
                     no_batched_rl=args.no_batched_rl,
                     device=device,)
@@ -200,7 +209,7 @@ def main():
     
     generated_smiles = generate_smiles(model=model,
                                           tokenizer=tokenizer,
-                                          temprature=args.temprature,
+                                          temperature=args.temperature,
                                           size=args.eval_size,
                                           max_len=args.eval_max_len,
                                           device=args.device)
@@ -214,5 +223,3 @@ def main():
               run_moses=True,
               reward_fn=reward_fn)
 
-if __name__ == "__main__":
-    main()

@@ -23,9 +23,6 @@ import numpy as np
 import xgboost as xgb
 from map4 import MAP4Calculator
 
-from itertools import zip_longest
-
-
 
 # Define MAP4 Function
 def get_map4(smiles_string):
@@ -50,7 +47,7 @@ def load_xgb_model(filepath):
 
 def get_reward_fn(reward_names: List[str], paths: List[str]=None, multipliers: List[str]=None, **kwargs):
     reward_fns = []
-    for reward_name, path, mult in zip_longest(reward_names, paths, multipliers, fillvalue=None):
+    for reward_name, path, mult in zip(reward_names, paths, multipliers):
         if reward_name == 'Anti Cancer':
             reward_fn = ChempropReward(path, reward_name, multiplier=eval(mult))
 
@@ -66,25 +63,16 @@ def get_reward_fn(reward_names: List[str], paths: List[str]=None, multipliers: L
         elif reward_name == 'Docking':
             reward_fn = DockingReward(path, reward_name, multiplier=eval(mult))
             
-        elif reward_name == 'EmissionReward':
+        elif reward_name == 'ChromoGen':
             evaluated_multiplier = eval(mult) if mult is not None else None
-            reward_fn = EmissionReward(multiplier=evaluated_multiplier)
-            
-        elif reward_name == 'AbsorptionReward':
-            evaluated_multiplier = eval(mult) if mult is not None else None
-            reward_fn = AbsorptionReward(multiplier=evaluated_multiplier)
-            
-        elif reward_name == 'QuantumYieldReward':
-            evaluated_multiplier = eval(mult) if mult is not None else None
-            reward_fn = QuantumYieldReward(multiplier=evaluated_multiplier)
+            reward_fn = ChromophoreReward(multiplier=evaluated_multiplier)
+        
         
         reward_fns.append(reward_fn)
 
     if len(reward_fns) == 1:
-        print("Single reward function chosen")
         return reward_fns[0]
     else:
-        print("Multipe Reward functions chosen")
         return MultiReward(name='MultiReward', reward_fns=reward_fns)
 
 class Reward(ABC):
@@ -108,12 +96,15 @@ class Reward(ABC):
     def __str__(self,):
         return self.name
 
-class EmissionReward(Reward):
-    def __init__(self, desired_emission=1000, weight=1, multiplier=None):
-        super().__init__(name="EmissionReward", multiplier=multiplier)
-        self.desired_emission = desired_emission
-        self.weight = weight
-        self.model, self.features = load_xgb_model('./data/models/emission_model.json')
+class ChromophoreReward(Reward):
+    def __init__(self, multiplier=None):
+        super().__init__(name="ChromophoreReward", multiplier=multiplier)
+        self.desired_properties = {'emission': 700, 'absorption': 500, 'quantum_yield': 0.99}
+        self.weights = {'emission': 0.05, 'absorption': 0.05, 'quantum_yield': 10.0}
+
+        self.emission_model, self.emi_features = load_xgb_model('./data/models/emission_model.json')
+        self.absorption_model, self.abs_features = load_xgb_model('./data/models/absorption_model.json')
+        self.quantum_yield_model, self.qy_features = load_xgb_model('./data/models/quantum_yield_model.json')
 
     def __call__(self, smiles_list):
         if isinstance(smiles_list, str):
@@ -121,65 +112,66 @@ class EmissionReward(Reward):
 
         rewards = []
         for smiles in smiles_list:
-            map4_fp = get_map4(smiles)
-            if map4_fp is None:
-                rewards.append(-10000.0)
+            mol = Chem.MolFromSmiles(smiles)
+            if not smiles or mol is None:
+                rewards.append(-10000.0)  # Penalty for invalid or empty SMILES
                 continue
 
-            dmatrix = xgb.DMatrix(np.array(map4_fp).reshape(1, -1), feature_names=self.features)
-            predicted_emission = self.model.predict(dmatrix)[0]
-            reward = -self.weight * abs(self.desired_emission - predicted_emission)
-            rewards.append(reward)
+            mol = AllChem.AddHs(mol)
+            AllChem.EmbedMolecule(mol, AllChem.ETKDG())
+            map4_fp = get_map4(smiles)  # Assuming get_map4 is defined elsewhere
 
-        return rewards
-
-class AbsorptionReward(Reward):
-    def __init__(self, desired_absorption=800, weight=1, multiplier=None):
-        super().__init__(name="AbsorptionReward", multiplier=multiplier)
-        self.desired_absorption = desired_absorption
-        self.weight = weight
-        self.model, self.features = load_xgb_model('./data/models/absorption_model.json')
-
-    def __call__(self, smiles_list):
-        if isinstance(smiles_list, str):
-            smiles_list = [smiles_list]
-
-        rewards = []
-        for smiles in smiles_list:
-            map4_fp = get_map4(smiles)
             if map4_fp is None:
-                rewards.append(-10000.0)
+                rewards.append(-10000.0)  # Penalty for invalid MAP4 fingerprint
                 continue
 
-            dmatrix = xgb.DMatrix(np.array(map4_fp).reshape(1, -1), feature_names=self.features)
-            predicted_absorption = self.model.predict(dmatrix)[0]
-            reward = -self.weight * abs(self.desired_absorption - predicted_absorption)
-            rewards.append(reward)
+            map4_array = np.array(map4_fp)
 
-        return rewards
+            # Create DMatrix for each model with the correct feature names
+            dmatrix_map4_array_emission = xgb.DMatrix(map4_array.reshape(1, -1), feature_names=self.emi_features)
+            dmatrix_map4_array_absorption = xgb.DMatrix(map4_array.reshape(1, -1), feature_names=self.abs_features)
+            dmatrix_map4_array_quantum_yield = xgb.DMatrix(map4_array.reshape(1, -1), feature_names=self.qy_features)
 
-class QuantumYieldReward(Reward):
-    def __init__(self, desired_quantum_yield=0.99, weight=500, multiplier=None):
-        super().__init__(name="QuantumYieldReward", multiplier=multiplier)
-        self.desired_quantum_yield = desired_quantum_yield
-        self.weight = weight
-        self.model, self.features = load_xgb_model('./data/models/quantum_yield_model.json')
+            # Predict properties using the respective DMatrix
+            predicted_properties = {
+                'emission': self.emission_model.predict(dmatrix_map4_array_emission)[0],
+                'absorption': self.absorption_model.predict(dmatrix_map4_array_absorption)[0],
+                'quantum_yield': self.quantum_yield_model.predict(dmatrix_map4_array_quantum_yield)[0]
+            }
 
-    def __call__(self, smiles_list):
-        if isinstance(smiles_list, str):
-            smiles_list = [smiles_list]
+            # Initialize individual rewards
+            emission_reward = 0
+            absorption_reward = 0
+            quantum_yield_reward = 0
 
-        rewards = []
-        for smiles in smiles_list:
-            map4_fp = get_map4(smiles)
-            if map4_fp is None:
-                rewards.append(-10000.0)
-                continue
+            # Calculate individual rewards
+            for prop in self.desired_properties:
+                reward = -abs(predicted_properties[prop] - self.desired_properties[prop])
+                if prop == 'emission':
+                    emission_reward = self.weights[prop] * reward
+                elif prop == 'absorption':
+                    absorption_reward = self.weights[prop] * reward
+                elif prop == 'quantum_yield':
+                    quantum_yield_reward = self.weights[prop] * reward
 
-            dmatrix = xgb.DMatrix(np.array(map4_fp).reshape(1, -1), feature_names=self.features)
-            predicted_quantum_yield = self.model.predict(dmatrix)[0]
-            reward = -self.weight * abs(self.desired_quantum_yield - predicted_quantum_yield)
-            rewards.append(reward)
+            # Combine individual rewards
+            total_reward = emission_reward + absorption_reward + quantum_yield_reward
+            
+            # Used to debug weights to make sure they are in range of each other
+            """
+            print("")
+            print("Rewards:")
+            print(f"Emission reward: {emission_reward}")
+            print(f"Absorption reward: {absorption_reward}")
+            print(f"Quantum yield reward: {quantum_yield_reward}")
+            print(f"Total reward: {total_reward}")
+            """
+            
+            # Apply multiplier if present
+            if self.multiplier is not None:
+                total_reward = self.multiplier(total_reward)
+
+            rewards.append(total_reward)
 
         return rewards
 

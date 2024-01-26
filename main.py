@@ -21,44 +21,38 @@ from src.utils.utils import parse_arguments
 
 torch.autograd.set_detect_anomaly(True)
 
-if __name__ == "__main__":
+# set seeds
+# torch.manual_seed(0)
+# np.random.seed(0)
+# random.seed(0)
+
+### Considering adding a debug/logfile options instead of printing?  Or check for verbosity argument and print-if-verbose?
+
+
+if __name__ == "__main__":  # removed def main(): in place of if __name__ == "__main__":, since the latter only called the former.
+    # Collect and parse all CL arguments
     args = parse_arguments()
-    device = torch.device(args.device)
 
-    ### MAH - START
-    # If a dataset_path is given, checks to ensure the file at that location exists.  If it does not exist, and the desired file is known to use, it is downloaded from Zenodo and decompressed to the proper location.  This will ensure that the specific datasets need not be preinstalled, which will make it more streamlined on newer systems - only download the datasets that are actually being used.
-    if args.dataset_path:        
-        if not os.path.exists(args.dataset_path):
-            dataset_dirname = os.path.dirname(args.dataset_path)
-            dataset_filename = args.dataset_path.split("/")[-1]
-            _currdir=os.getcwd()
-            dataset_urls = {
-                "gdb13.smi":"https://zenodo.org/record/5172018/files/gdb13.tgz",
-                "GDB13_Subset-AB.smi":"https://zenodo.org/record/5172018/files/GDB13_Subset-AB.smi.gz",
-                "gdb13.1M.freq.ll.smi":"https://zenodo.org/record/5172018/files/gdb13.1M.freq.ll.smi.gz",
-            }
-            print(f"{args.dataset_path} dataset missing.")
-            if dataset_filename in [x for x in dataset_urls.keys()]:
-                os.chdir(dataset_dirname)
-                os.system(f"wget {dataset_urls[dataset_filename]} && gzip -d {dataset_filename}.gz")
-                os.chdir(_currdir)
-            else:
-                print("Unable to obtain dataset automatically.")
+    # Process known arguments for errors and logging.
+    if args.tokenizer not in ["Char","BPE"]:
+        raise ValueError("Tokenizer type not supported")
 
-    ### moved this if-elif-else block above args.train_predictor check, as 'tokenizer' must be defined before being used by the internals of train_predictor.
     if args.tokenizer == "Char":
         tokenizer = CharTokenizer(args.tokenizer_path, args.dataset_path)
 
     elif args.tokenizer == "BPE":
         tokenizer = BPETokenizer(args.tokenizer_path, args.dataset_path, vocab_size=500)
+       
+    print(args.device)
+    device = torch.device(args.device)
 
-    else:
-        raise ValueError("Tokenizer type not supported")
-    ### MAH - END
-                
+    max_smiles_len = get_max_smiles_len(args.dataset_path) + 50
+    print(f'{max_smiles_len=}')
+
+    dataset_name = args.dataset_path[args.dataset_path.rfind('/')+1:args.dataset_path.rfind('.')]
+
     if args.train_predictor:
-        bs1_data = pd.read_csv(args.predictor_dataset_path)
-        train, test = train_test_split(bs1_data, test_size=0.2, random_state=42, shuffle=True,)
+        train, test = train_test_split(pd.read_csv(args.predictor_dataset_path), test_size=0.2, random_state=42, shuffle=True) ### This function comes from sklearn, no messing with it.
 
         print("Shape of training data: ",train.shape) #Make print statement more clear.
         train.reset_index(inplace=True)
@@ -122,8 +116,6 @@ if __name__ == "__main__":
 
     print(str(model))
     print(sum(p.numel() for p in model.parameters()))
-
-    dataset_name = args.dataset_path[args.dataset_path.rfind('/')+1:args.dataset_path.rfind('.')]
     
     reward_fn = get_reward_fn(reward_names=args.reward_fns,
                         paths=args.predictor_paths,
@@ -152,7 +144,7 @@ if __name__ == "__main__":
         trainer.train(args.epochs, args.batch_size, device)
 
     if not os.path.exists(eval_save_path):
-        os.makedirs(eval_save_path, exist_ok=True)
+        os.makedirs(eval_save_path, exist_ok=True) # Why the check for existence if you're including the "exist_ok=True" flag?  Alternatively, why include the flag if you're only calling this function if the directory doesn't exist?
 
     with open(f'{eval_save_path}/command.txt', 'w') as f:
         f.write(' '.join(sys.argv))
@@ -222,4 +214,4 @@ if __name__ == "__main__":
               folder_name='post_RL',
               run_moses=True,
               reward_fn=reward_fn)
-
+              reward_fn=reward_fn)

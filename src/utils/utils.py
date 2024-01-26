@@ -89,7 +89,7 @@ def parse_arguments():  ## Something like this might necessitate including an in
     parser.add_argument('--train_predictor', action='store_true')
     parser.add_argument('--predictor_batch_size', type=int, default=32)
     parser.add_argument('--predictor_epochs', type=int, default=10)
-    parser.add_argument('--preditor_n_embd', type=int, default=512,
+    parser.add_argument('--predictor_n_embd', type=int, default=512,
                         help='model embedding size')
     parser.add_argument('--predictor_d_model', type=int, default=1024,
                         help='model ffn size')
@@ -173,30 +173,3 @@ def sample(model,
         x = torch.cat((x, idxs), dim=1)
 
     return x
-
-# ### This function is defined here, imported in one other location, and never actually used.  Can we get rid of it?
-# def sample_scaffolds(model,      
-#            start_token: int,
-#            enc_inp,
-#            enc_padding_mask,
-#            size: int,
-#            max_len: int,
-#            temperature: int,
-#            device,):
-
-#     x = torch.tensor([[start_token]] * size, dtype=torch.long).to(device)
-#     enc_inp = torch.tensor([enc_inp] * size, dtype=torch.long).to(device)
-#     enc_padding_mask = torch.tensor([enc_padding_mask] * size, dtype=torch.long).to(device)
-#     for k in trange(max_len, leave=False):
-#         logits = model(enc_inp=enc_inp, dec_inp=x, enc_padding_mask=enc_padding_mask)
-
-#         if isinstance(logits, tuple):
-#                 logits = logits[0]
-
-#         logits = logits[:, -1, :] / temperature
-#         probs = F.softmax(logits, dim=-1)
-#         idxs = torch.multinomial(probs, num_samples=1)
-
-#         x = torch.cat((x, idxs), dim=1)
-
-#     return x

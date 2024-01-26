@@ -21,6 +21,7 @@ from src.utils.utils import parse_arguments
 
 torch.autograd.set_detect_anomaly(True)
 
+<<<<<<< HEAD
 if __name__ == "__main__":
     args = parse_arguments()
     device = torch.device(args.device)
@@ -56,15 +57,51 @@ if __name__ == "__main__":
         raise ValueError("Tokenizer type not supported")
     ### MAH - END
                 
+=======
+# set seeds
+# torch.manual_seed(0)
+# np.random.seed(0)
+# random.seed(0)
+
+### Considering adding a debug/logfile options instead of printing?  Or check for verbosity argument and print-if-verbose?
+
+
+if __name__ == "__main__":  # removed def main(): in place of if __name__ == "__main__":, since the latter only called the former.
+    # Collect and parse all CL arguments
+    args = parse_arguments()
+
+    # Process known arguments for errors and logging.
+    if args.tokenizer not in ["Char","BPE"]:
+        raise ValueError("Tokenizer type not supported")
+
+    if args.tokenizer == "Char":
+        tokenizer = CharTokenizer(args.tokenizer_path, args.dataset_path)
+
+    elif args.tokenizer == "BPE":
+        tokenizer = BPETokenizer(args.tokenizer_path, args.dataset_path, vocab_size=500)
+       
+    print(args.device)
+    device = torch.device(args.device)
+
+    max_smiles_len = get_max_smiles_len(args.dataset_path) + 50
+    print(f'{max_smiles_len=}')
+
+    dataset_name = args.dataset_path[args.dataset_path.rfind('/')+1:args.dataset_path.rfind('.')]
+
+>>>>>>> 103b1d3 (update to commenting and cleanup)
     if args.train_predictor:
-        bs1_data = pd.read_csv(args.predictor_dataset_path)
-        train, test = train_test_split(bs1_data, test_size=0.2, random_state=42, shuffle=True,)
+        train, test = train_test_split(pd.read_csv(args.predictor_dataset_path), test_size=0.2, random_state=42, shuffle=True) ### This function comes from sklearn, no messing with it.
 
         print("Shape of training data: ",train.shape) #Make print statement more clear.
         train.reset_index(inplace=True)
         test.reset_index(inplace=True)
 
+<<<<<<< HEAD
         predictor_tokenizer = CharTokenizer(args.predictor_tokenizer_path, data_path='./data/ic50_smiles.smi')
+=======
+        predictor_tokenizer = CharTokenizer(args.predictor_tokenizer_path,
+                                            data_path='./data/ic50_smiles.smi')
+>>>>>>> 103b1d3 (update to commenting and cleanup)
 
         train_dataset = BS1Dataset(train, predictor_tokenizer)
         test_dataset = BS1Dataset(test, predictor_tokenizer)
@@ -93,11 +130,14 @@ if __name__ == "__main__":
 
         torch.save(predictor_model, args.predictor_save_path)
 
+<<<<<<< HEAD
     print("Device: ",args.device)
     
     max_smiles_len = get_max_smiles_len(args.dataset_path) + 50
     print(f'{max_smiles_len=}')
 
+=======
+>>>>>>> 103b1d3 (update to commenting and cleanup)
     dataset = get_dataset(data_path=args.dataset_path,
                           tokenizer=tokenizer,
                           use_scaffold=args.use_scaffold,
@@ -122,8 +162,6 @@ if __name__ == "__main__":
 
     print(str(model))
     print(sum(p.numel() for p in model.parameters()))
-
-    dataset_name = args.dataset_path[args.dataset_path.rfind('/')+1:args.dataset_path.rfind('.')]
     
     reward_fn = get_reward_fn(reward_names=args.reward_fns,
                         paths=args.predictor_paths,
@@ -152,7 +190,7 @@ if __name__ == "__main__":
         trainer.train(args.epochs, args.batch_size, device)
 
     if not os.path.exists(eval_save_path):
-        os.makedirs(eval_save_path, exist_ok=True)
+        os.makedirs(eval_save_path, exist_ok=True) # Why the check for existence if you're including the "exist_ok=True" flag?  Alternatively, why include the flag if you're only calling this function if the directory doesn't exist?
 
     with open(f'{eval_save_path}/command.txt', 'w') as f:
         f.write(' '.join(sys.argv))
@@ -221,5 +259,9 @@ if __name__ == "__main__":
               save_path=eval_save_path,
               folder_name='post_RL',
               run_moses=True,
+<<<<<<< HEAD
               reward_fn=reward_fn)
 
+=======
+              reward_fn=reward_fn)
+>>>>>>> 103b1d3 (update to commenting and cleanup)

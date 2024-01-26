@@ -18,7 +18,7 @@ class TaskOpt(Enum):
 	REGULAR = 1
 	CONSTRAINED = 2
  
-def parse_arguments():
+def parse_arguments():  ## Something like this might necessitate including an input file instead.  You can create an input file
     parser = argparse.ArgumentParser()
     parser.add_argument('--batch_size', type=int, default=512,
                         help='batch size for the language modeling task')

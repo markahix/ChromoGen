@@ -176,7 +176,16 @@ def calc_set_stat(mol_set: List[Chem.rdchem.Mol],
     else:
         batch_rewards = np.array([fail_safe(func, mol) for mol in tqdm(mol_set, desc=desc)])
         
-    print(f"Batch rewards calculated: {batch_rewards[:5]}")  # Print first few rewards for a sanity check
+    # Check if batch_rewards is a list
+    if isinstance(batch_rewards, list):
+        print(f"Batch rewards calculated (list): {batch_rewards[:5]}")
+    # Check if batch_rewards is a dictionary
+    elif isinstance(batch_rewards, dict):
+        # Extract the first few items from the dictionary
+        first_few_items = {k: batch_rewards[k] for k in list(batch_rewards.keys())[:5]}
+        print(f"Batch rewards calculated (dict): {first_few_items}")
+    else:
+        print("batch_rewards is neither a list nor a dictionary")
         
     if None in batch_rewards:
         print("Warning: batch_rewards contains None values.")
@@ -333,7 +342,16 @@ def get_stats(train_set: Dataset,
                                                                         lst=True,
                                                                         value_range=(0, 1),
                                                                         desc=f'{str(reward_fn)}')
-        print(f"Generated Reward Values: {generated_reward_values[:5]}")
+        # Check if generated_reward_stats is a list
+        if isinstance(generated_reward_stats, list):
+            print(f"Generated reward stats (list): {generated_reward_stats[:5]}")
+        # Check if generated_reward_stats is a dictionary
+        elif isinstance(generated_reward_stats, dict):
+            # Extract the first few items from the dictionary
+            first_few_items = {k: generated_reward_stats[k] for k in list(generated_reward_stats.keys())[:5]}
+            print(f"Generated reward stats calculated (dict): {first_few_items}")
+        else:
+            print("generated_reward_stats is neither a list nor a dictionary")
         print(f"Generated Reward Stats: {generated_reward_stats}")
 
 

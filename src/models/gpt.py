@@ -94,7 +94,7 @@ class GPT(nn.Module):
             return logits, attn_weights
         # return output
 
-    def generate(self, initial_token, end_token, temprature: int=1, max_len: int=100, device=torch.device('cuda')):
+    def generate(self, initial_token, end_token, temperature: int=1, max_len: int=100, device=torch.device('cuda')):
         tokens = [initial_token]
         next_token = -1
         while next_token != end_token and len(tokens) < max_len:
@@ -105,7 +105,7 @@ class GPT(nn.Module):
                 y_pred = y_pred[0]
 
             last_word_logits = y_pred[0][-1]
-            p = torch.nn.functional.softmax(last_word_logits / temprature, dim=0)
+            p = torch.nn.functional.softmax(last_word_logits / temperature, dim=0)
             if p.device.type != 'cpu':
                 p = p.cpu()
             next_token = np.random.choice(len(last_word_logits), p=p.detach().numpy())

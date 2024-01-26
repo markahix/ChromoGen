@@ -18,13 +18,13 @@ import torch
 from tqdm import trange, tqdm
 
 from ..utils.metrics import calc_qed, calc_sas, calc_diversity, calc_novelty, calc_valid_molecules, calc_num_rings
-from ..utils.utils import generate_and_save_plot, sample, sample_scaffodls
+from ..utils.utils import generate_and_save_plot, sample
 from ..utils.mol_utils import convert_to_molecules, filter_invalid_molecules
 
 def generate_smiles_scaffolds(model,
                               tokenizer,
                               scaffolds,
-                              temprature=1,
+                              temperature=1,
                               num_samples=10,
                               size: int=1000,
                               batch_size: int=100,
@@ -51,7 +51,7 @@ def generate_smiles_scaffolds(model,
         for batch in range(size // (batch_size * len(scaffolds_sample))):
 
             tokens = sample(model, encoding['input_ids'],
-                        batch_size, max_len, temprature, device,)
+                        batch_size, max_len, temperature, device,)
 
             tokens = tokens.tolist()
 
@@ -76,7 +76,7 @@ def generate_smiles_scaffolds(model,
 def generate_smiles_constrained(model,
                               tokenizer,
                               scaffolds,
-                              temprature=1,
+                              temperature=1,
                               num_samples=10,
                               size: int=1000,
                               batch_size: int=100,
@@ -97,7 +97,7 @@ def generate_smiles_constrained(model,
     for scaffold in scaffolds_sample:
         encoding = tokenizer('[BOS]' + scaffold + '[SEP]')
 
-        tokens = sample(model, encoding, batch_size, max_len, temprature, device)
+        tokens = sample(model, encoding, batch_size, max_len, temperature, device)
         tokens = tokens.tolist()
 
         for mol in tokens:
@@ -115,7 +115,7 @@ def generate_smiles_constrained(model,
 
 def generate_smiles(model,
                     tokenizer,
-                    temprature: int=1,
+                    temperature: int=1,
                     size: int=1000,
                     batch_size: int=100,
                     max_len:int=100,
@@ -134,7 +134,7 @@ def generate_smiles(model,
 
     
     for batch in trange(batches, disable=disable):
-        tokens = sample(model, [tokenizer.bos_token_id], batch_size, max_len, temprature, device)
+        tokens = sample(model, [tokenizer.bos_token_id], batch_size, max_len, temperature, device)
         tokens = tokens.tolist()
 
         for mol in tokens:

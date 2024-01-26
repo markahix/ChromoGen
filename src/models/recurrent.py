@@ -52,7 +52,7 @@ class RecurrentModel(nn.Module):
         else:
             return logits
 
-    def generate(self, initial_token, end_token, temprature: int=1, max_len: int=100, device=torch.device('cuda')):
+    def generate(self, initial_token, end_token, temperature: int=1, max_len: int=100, device=torch.device('cuda')):
         tokens = [initial_token]
         next_token = ''
         while next_token != end_token and len(tokens) < max_len:

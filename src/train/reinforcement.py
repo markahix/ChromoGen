@@ -44,7 +44,7 @@ def policy_gradients(model,
                 batch_tokens = generate_smiles_scaffolds(model=model,
                                                         tokenizer=tokenizer,
                                                         scaffolds=[scaffold],
-                                                        temprature=kwargs['temprature'],
+                                                        temperature=kwargs['temperature'],
                                                         size=batch_size,
                                                         num_samples=1,
                                                         batch_size=batch_size // 5,
@@ -53,7 +53,7 @@ def policy_gradients(model,
                                                         return_smiles=False)
             else:
                 batch_tokens = generate_smiles(model=model, tokenizer=tokenizer,
-                                    temprature=kwargs['temprature'], size=batch_size, batch_size=batch_size // 2, max_len=max_len, device=device, return_smiles=False)
+                                    temperature=kwargs['temperature'], size=batch_size, batch_size=batch_size // 2, max_len=max_len, device=device, return_smiles=False)
 
                 len_scaffold = len(scaffold_tokens) - 1 if use_scaffold else 0
                 batch_smiles = [tokenizer.decode(tokens[len_scaffold+1:-1]) for tokens in batch_tokens]
@@ -64,7 +64,7 @@ def policy_gradients(model,
             batch_rewards = []
             for _ in trange(batch_size // 50):
                 batch_tokens = generate_smiles(model=model, tokenizer=tokenizer,
-                                    temprature=kwargs['temprature'], size=50, batch_size=1, max_len=max_len, device=device, return_smiles=False)
+                                    temperature=kwargs['temperature'], size=50, batch_size=1, max_len=max_len, device=device, return_smiles=False)
 
                 len_scaffold = len(scaffold_tokens) - 1 if use_scaffold else 0
                 smiles = [tokenizer.decode(tokens[len_scaffold+1:-1]) for tokens in batch_tokens]
@@ -105,7 +105,7 @@ def policy_gradients(model,
                 generated_smiles = generate_smiles_scaffolds(model=model,
                                             tokenizer=tokenizer,
                                             scaffolds=[scaffold],
-                                            temprature=kwargs['temprature'],
+                                            temperature=kwargs['temperature'],
                                             size=kwargs['size'],
                                             batch_size=100,
                                             max_len=max_len,
@@ -114,7 +114,7 @@ def policy_gradients(model,
             else:
                 generated_smiles = generate_smiles(model=model,
                                           tokenizer=tokenizer,
-                                          temprature=kwargs['temprature'],
+                                          temperature=kwargs['temperature'],
                                           size=kwargs['size'],
                                           max_len=max_len,
                                           device=device)

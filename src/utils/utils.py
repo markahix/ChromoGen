@@ -18,7 +18,7 @@ class TaskOpt(Enum):
 	REGULAR = 1
 	CONSTRAINED = 2
  
-def parse_arguments():
+def parse_arguments():  ## Something like this might necessitate including an input file instead.  You can create an input file
     parser = argparse.ArgumentParser()
     parser.add_argument('--batch_size', type=int, default=512,
                         help='batch size for the language modeling task')
@@ -47,8 +47,8 @@ def parse_arguments():
                         help='eval the model during the RL stage')
     parser.add_argument('--eval_steps', type=int, default=10,
                         help='every how many steps do eval during the RL stage')
-    parser.add_argument('--rl_temprature', type=float, default=1,
-                        help='temprature during the RL stage')
+    parser.add_argument('--rl_temperature', type=float, default=1,
+                        help='temperature during the RL stage')
     parser.add_argument('--multipliers', type=str, default=["lambda x: x"], nargs='+',
                         help='predictor path for the Property Predictor reward function')
     parser.add_argument('--no_batched_rl', action='store_true', help='if to train the rl model with while generating batches.')
@@ -61,8 +61,8 @@ def parse_arguments():
                         help='number of molecules to generate during final evaluation')
     parser.add_argument('--eval_max_len', type=int, default=150,
                         help='the maximum size of molecule the model can generate during the final evalutation stage')
-    parser.add_argument('--temprature', type=float, default=1,
-                        help='softmax temprature during the final evaluation')
+    parser.add_argument('--temperature', type=float, default=1,
+                        help='softmax temperature during the final evaluation')
 
     parser.add_argument('--n_embd', type=int, default=512,
                         help='model embedding size')
@@ -158,7 +158,7 @@ def sample(model,
            start_token: int,
            size: int,
            max_len: int,
-           temprature: int,
+           temperature: int,
            device,):
 
     x = torch.tensor([start_token] * size, dtype=torch.long).to(device)
@@ -169,7 +169,7 @@ def sample(model,
         if isinstance(logits, tuple):
                 logits = logits[0]
 
-        logits = logits[:, -1, :] / temprature
+        logits = logits[:, -1, :] / temperature
         probs = F.softmax(logits, dim=-1)
         idxs = torch.multinomial(probs, num_samples=1)
 
@@ -177,29 +177,30 @@ def sample(model,
 
     return x
 
-def sample_scaffodls(model,
-           start_token: int,
-           enc_inp,
-           enc_padding_mask,
-           size: int,
-           max_len: int,
-           temprature: int,
-           device,):
+# ### This function is defined here, imported in one other location, and never actually used.  Can we get rid of it?
+# def sample_scaffolds(model,      
+#            start_token: int,
+#            enc_inp,
+#            enc_padding_mask,
+#            size: int,
+#            max_len: int,
+#            temperature: int,
+#            device,):
 
-    x = torch.tensor([[start_token]] * size, dtype=torch.long).to(device)
-    enc_inp = torch.tensor([enc_inp] * size, dtype=torch.long).to(device)
-    enc_padding_mask = torch.tensor([enc_padding_mask] * size, dtype=torch.long).to(device)
-    for k in trange(max_len, leave=False):
-        logits = model(enc_inp=enc_inp, dec_inp=x, enc_padding_mask=enc_padding_mask)
+#     x = torch.tensor([[start_token]] * size, dtype=torch.long).to(device)
+#     enc_inp = torch.tensor([enc_inp] * size, dtype=torch.long).to(device)
+#     enc_padding_mask = torch.tensor([enc_padding_mask] * size, dtype=torch.long).to(device)
+#     for k in trange(max_len, leave=False):
+#         logits = model(enc_inp=enc_inp, dec_inp=x, enc_padding_mask=enc_padding_mask)
 
-        if isinstance(logits, tuple):
-                logits = logits[0]
+#         if isinstance(logits, tuple):
+#                 logits = logits[0]
 
-        logits = logits[:, -1, :] / temprature
-        probs = F.softmax(logits, dim=-1)
-        idxs = torch.multinomial(probs, num_samples=1)
+#         logits = logits[:, -1, :] / temperature
+#         probs = F.softmax(logits, dim=-1)
+#         idxs = torch.multinomial(probs, num_samples=1)
 
-        x = torch.cat((x, idxs), dim=1)
+#         x = torch.cat((x, idxs), dim=1)
 
-    return x
+#     return x
     

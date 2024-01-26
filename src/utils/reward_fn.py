@@ -183,8 +183,7 @@ class MultiReward(Reward):
     def __call__(self, smiles):
         rewards = OrderedDict()
         for fn in self.reward_fns:
-            reward = fn(smiles)
-            rewards[str(fn)] =  reward
+            rewards[str(fn)] =  fn(smiles)
 
         if not self.eval:
             rewards = list(zip(*list(rewards.values())))
@@ -241,11 +240,8 @@ class DockingReward(Reward):
             for setup in mol_setups:
                 pdbqt_string, is_ok, error_msg = PDBQTWriterLegacy.write_string(setup)
 
-
             if not is_ok:
                 return 0
-            # with open(f"./data/proteins/{smiles}.pdbqt", 'w') as f:
-            #    f.write(pdbqt_string)
         
             # Configure Vina
             self.vina.set_receptor(self.receptor_path)
@@ -258,9 +254,7 @@ class DockingReward(Reward):
             # Run docking
             self.vina.dock(n_poses=5, exhaustiveness=32)
 
-            score = self.vina.score()[0]
-
-            return score
+            return self.vina.score()[0]
 
         except Exception:
             return 0
@@ -351,6 +345,7 @@ class QEDReward(Reward):
 
         return rewards
 
+## Is anything below this line getting used, or can we delete it entirely?
 def main():
     with QEDReward() as rfn:
         print(rfn("CCO"))

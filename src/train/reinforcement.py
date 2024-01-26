@@ -23,7 +23,7 @@ def policy_gradients(model,
                      no_batched_rl: bool=False,
                      device=torch.device('cuda'),
                      **kwargs):
-    print(f'Reinfocement {device}')
+    print(f'Reinforcement {device}')
     model.train()
     model.to(device)
     optimizer = optimizer(model.parameters(), step_size)

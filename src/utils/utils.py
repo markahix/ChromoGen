@@ -137,7 +137,6 @@ def generate_and_save_plot(values: List[float],
     plot.figure.savefig(f'{save_path}/{name}.png')
     plt.clf()
 
-
 def get_max_smiles_len(data_path: str) -> int:
     """
     Returns the length of the molecule which has the longest SMILES string.
@@ -151,7 +150,6 @@ def get_max_smiles_len(data_path: str) -> int:
             max_len = file_max_len if file_max_len > max_len else max_len
     else:
         max_len = len(max(open(data_path, 'r'), key=len).strip())
-    
     return max_len
 
 def sample(model,
@@ -165,7 +163,6 @@ def sample(model,
     for k in trange(max_len, leave=False):
         with torch.no_grad():
             logits = model(x)
-
         if isinstance(logits, tuple):
                 logits = logits[0]
 
@@ -203,4 +200,3 @@ def sample(model,
 #         x = torch.cat((x, idxs), dim=1)
 
 #     return x
-    

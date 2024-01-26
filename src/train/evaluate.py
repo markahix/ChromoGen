@@ -9,7 +9,7 @@ from torch.utils.data import Dataset
 import numpy as np
 import pandas as pd
 from rdkit import Chem
-from rdkit.Chem import Draw
+from rdkit.Chem import Draw, QED
 from rdkit import RDLogger
 RDLogger.DisableLog('rdApp.*')
 
@@ -265,7 +265,7 @@ def get_top_k_mols(generated_molecules: List[Chem.rdchem.Mol],
                 if score_name != 'qed':
                     metrics[f'top {i+1} {name}'] = score[i]
 
-            metrics[f'top {i+1} qed'] = calc_qed(molecule)
+            metrics[f'top {i+1} qed'] = QED.qed(molecule)
             metrics[f'top {i+1} sas'] = calc_sas(molecule)
             metrics[f'top {i+1} len'] = len(smiles)
 
@@ -281,7 +281,7 @@ def get_top_k_mols(generated_molecules: List[Chem.rdchem.Mol],
             metrics[f'top_{i+1}_smiles'] = smiles
             if score_name != 'qed':
                 metrics[f'top {i+1} {score_name}'] = score
-            metrics[f'top {i+1} qed'] = calc_qed(molecule)
+            metrics[f'top {i+1} qed'] = QED.qed(molecule)
             metrics[f'top {i+1} sas'] = calc_sas(molecule)
             metrics[f'top {i+1} len'] = len(smiles)
 
@@ -318,7 +318,7 @@ def get_stats(train_set: Dataset,
 
     print('Calculating QED')
     generated_qed_values, generated_qed_stats = calc_set_stat(generated_molecules,
-                                                            calc_qed,
+                                                            QED.qed,
                                                             lst=False,
                                                             value_range=(0, 1),
                                                             desc='QED')

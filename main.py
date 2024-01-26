@@ -3,9 +3,6 @@ import sys
 import pandas as pd
 from rdkit import RDLogger
 RDLogger.DisableLog('rdApp.*')
-# lg = RDLogger.logger()
-# lg.setLevel(RDLogger.CRITICAL)
-
 from sklearn.model_selection import train_test_split
 import torch
 
@@ -57,12 +54,11 @@ if __name__ == "__main__":  # removed def main(): in place of if __name__ == "__
     if args.train_predictor:
         train, test = train_test_split(pd.read_csv(args.predictor_dataset_path), test_size=0.2, random_state=42, shuffle=True) ### This function comes from sklearn, no messing with it.
 
-        print(train.shape)
+        print("Shape of training data: ",train.shape) #Make print statement more clear.
         train.reset_index(inplace=True)
         test.reset_index(inplace=True)
 
-        predictor_tokenizer = CharTokenizer(args.predictor_tokenizer_path,
-                                            data_path='./data/ic50_smiles.smi')
+        predictor_tokenizer = CharTokenizer(args.predictor_tokenizer_path, data_path='./data/ic50_smiles.smi')
 
         train_dataset = BS1Dataset(train, predictor_tokenizer)
         test_dataset = BS1Dataset(test, predictor_tokenizer)
@@ -90,6 +86,11 @@ if __name__ == "__main__":  # removed def main(): in place of if __name__ == "__
         predictor_trainer.train(args.predictor_epochs, args.predictor_batch_size, device)
 
         torch.save(predictor_model, args.predictor_save_path)
+
+    print("Device: ",args.device)
+    
+    max_smiles_len = get_max_smiles_len(args.dataset_path) + 50
+    print(f'{max_smiles_len=}')
 
     dataset = get_dataset(data_path=args.dataset_path,
                           tokenizer=tokenizer,
@@ -212,4 +213,5 @@ if __name__ == "__main__":  # removed def main(): in place of if __name__ == "__
               save_path=eval_save_path,
               folder_name='post_RL',
               run_moses=True,
+              reward_fn=reward_fn)
               reward_fn=reward_fn)

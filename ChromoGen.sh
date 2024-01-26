@@ -56,3 +56,4 @@ else
 fi
 
 python main.py --load_pretrained --pretrained_path ./data/models/gpt_pre_rl_gdb13.pt --do_eval --dataset_path ./data/gdb/gdb13/gdb13.smi --tokenizer Char --tokenizer_path ./data/tokenizers/gdb13ScaffoldCharTokenizer.json --rl_epochs 250 --rl_size 250000 --batch_size 256 --eval_steps 25
+

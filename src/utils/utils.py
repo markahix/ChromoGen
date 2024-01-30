@@ -1,6 +1,6 @@
 import argparse
 from datetime import datetime
-from enum import Enum
+# from enum import Enum
 import os
 from typing import List
 
@@ -9,14 +9,14 @@ import torch
 from torch.nn import functional as F
 from tqdm import trange
 
-class ModelOpt(Enum):
-	RECURRENT = 1
-	GPT = 2
-	TRANSFORMER = 3
+# class ModelOpt(Enum):
+# 	RECURRENT = 1
+# 	GPT = 2
+# 	TRANSFORMER = 3
 
-class TaskOpt(Enum):
-	REGULAR = 1
-	CONSTRAINED = 2
+# class TaskOpt(Enum):
+# 	REGULAR = 1
+# 	CONSTRAINED = 2
  
 def parse_arguments():  ## Something like this might necessitate including an input file instead.  You can create an input file
     parser = argparse.ArgumentParser()

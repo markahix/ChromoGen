@@ -1,15 +1,15 @@
 from datetime import datetime 
 import os
-from enum import Enum
+# from enum import Enum
 
-class ModelOpt(Enum):
-    RECURRENT = 1
-    GPT = 2
-    TRANSFORMER = 3
+# class ModelOpt(Enum):
+#     RECURRENT = 1
+#     GPT = 2
+#     TRANSFORMER = 3
 
-class TaskOpt(Enum):
-    REGULAR = 1
-    CONSTRAINED = 2
+# class TaskOpt(Enum):
+#     REGULAR = 1
+#     CONSTRAINED = 2
 
 class Arguments():
     def __init__(self):
@@ -63,10 +63,10 @@ class Arguments():
         self.dataset_path                 = './data/gdb/gdb13/gdb13.smi'
         self.tokenizer_path               = './data/tokenizers/gdb13ScaffoldCharTokenizer.json'
         self.device                       = 'cuda'
-        self.model                        = ModelOpt.GPT
+        self.model                        = "GPT"
         self.use_scaffold                 = False
         self.log_level                    = "default" # "verbose", "debug"
-        print(type(self.model))
+    
     def CreateTemplateFile(self,inputfile):
         with open(inputfile,"w") as f:
             f.write("##################################### \n")
@@ -81,6 +81,9 @@ class Arguments():
                     f.write(f"{key:<30} {tmp}\n")
                 else:
                     f.write(f"{key:<30} {val}\n")
+        print("Input file not found.  Generating template file at given location.")
+        quit()
+    
     def ReadInputFile(self,inputfile):
         if not os.path.exists(inputfile):
             self.CreateTemplateFile(inputfile)
@@ -91,89 +94,142 @@ class Arguments():
                 [key,val] = line.strip().split(' ',1)
                 key = key.strip()
                 val = val.strip()
-                if key == "model":
-                    exec(f"args.{key} = {val}")
-                else:
-                    if type(val) == str:
-                        if val == "False":
-                            val = False
-                        elif val == "True":
-                            val = True
-                        else:
+                if type(val) == str:
+                    if val == "False":
+                        val = False
+                    elif val == "True":
+                        val = True
+                    else:
+                        try:
+                            val = int(val)
+                        except:
                             try:
-                                val = int(val)
+                                val = float(val)
                             except:
-                                try:
-                                    val = float(val)
-                                except:
-                                    if ',' in val:
-                                        val = val.split(",")
-                                    else:
-                                        val = "\'" + val + "\'"
-                    exec(f"args.{key} = {val}")
-            self.ValidateSettings()
+                                if ',' in val:
+                                    val = val.split(",")
+                                else:
+                                    val = "\'" + val + "\'"
+                exec(f"self.{key} = {val}")
         if type(self.multipliers) != list:
             self.multipliers = [self.multipliers]
         if type(self.reward_fns) != list:
             self.reward_fns = [self.reward_fns]
         if type(self.predictor_paths) != list:
             self.predictor_paths = [self.predictor_paths]
+        self.ValidateSettings()
+
     def ValidateSettings(self):
         invalid_settings = []
-        tests = [type(self.batch_size) == int,
-                type(self.epochs) == int,
-                type(self.learning_rate) == float,
-                type(self.load_pretrained) == bool,
-                type(self.do_train) == bool,
-                type(self.pretrained_path) == str,
-                type(self.tokenizer) == str,
-                type(self.rl_batch_size) == int,
-                type(self.rl_epochs) == int,
-                type(self.discount_factor) == float,
-                type(self.rl_max_len) == int,
-                type(self.rl_size) == int,
-                type(self.reward_fns) == list,
-                type(self.do_eval) == bool,
-                type(self.eval_steps) == int,
-                type(self.rl_temperature) == int,
-                type(self.multipliers) == list,
-                type(self.no_batched_rl) == bool,
-                type(self.predictor_paths) == list,
-                type(self.save_path) == str,
-                type(self.eval_size) == int,
-                type(self.eval_max_len) == int,
-                type(self.temperature) == int,
-                type(self.n_embd) == int,
-                type(self.d_model) == int,
-                type(self.n_layers) == int,
-                type(self.num_heads) == int,
-                type(self.block_size) == int,
-                type(self.proj_size) == int,
-                type(self.attn_dropout_rate) == float,
-                type(self.proj_dropout_rate) == float,
-                type(self.resid_dropout_rate) == float,
-                type(self.predictor_dataset_path) == str,
-                type(self.predictor_tokenizer_path) == str,
-                type(self.predictor_save_path) == str,
-                type(self.train_predictor) == bool,
-                type(self.predictor_batch_size) == int,
-                type(self.predictor_epochs) == int,
-                type(self.predictor_n_embd) == int,
-                type(self.predictor_d_model) == int,
-                type(self.predictor_n_layers) == int,
-                type(self.predictor_num_heads) == int,
-                type(self.predictor_block_size) == int,
-                type(self.predictor_proj_size) == int,
-                type(self.predictor_attn_dropout_rate) == float,
-                type(self.predictor_proj_dropout_rate) == float,
-                type(self.predictor_resid_dropout_rate) == float,
-                type(self.dataset_path) == str,
-                type(self.tokenizer_path) == str,
-                type(self.device) == str ,
-                type(self.model) == ModelOpt,
-                type(self.use_scaffold) == bool]
-        if all(tests):
+        if type(self.batch_size) != int:
+            invalid_settings.append("batch_size")
+        if type(self.epochs) != int:
+            invalid_settings.append("epochs")
+        if type(self.learning_rate) != float:
+            invalid_settings.append("learning_rate")
+        if type(self.load_pretrained) != bool:
+            invalid_settings.append("load_pretrained")
+        if type(self.do_train) != bool:
+            invalid_settings.append("do_train")
+        if type(self.pretrained_path) != str:
+            invalid_settings.append("pretrained_path")
+        if type(self.tokenizer) != str:
+            invalid_settings.append("tokenizer")
+        if type(self.rl_batch_size) != int:
+            invalid_settings.append("rl_batch_size")
+        if type(self.rl_epochs) != int:
+            invalid_settings.append("rl_epochs")
+        if type(self.discount_factor) != float:
+            invalid_settings.append("discount_factor")
+        if type(self.rl_max_len) != int:
+            invalid_settings.append("rl_max_len")
+        if type(self.rl_size) != int:
+            invalid_settings.append("rl_size")
+        if type(self.reward_fns) != list:
+            invalid_settings.append("reward_fns")
+        if type(self.do_eval) != bool:
+            invalid_settings.append("do_eval")
+        if type(self.eval_steps) != int:
+            invalid_settings.append("eval_steps")
+        if type(self.rl_temperature) != int:
+            invalid_settings.append("rl_temperature")
+        if type(self.multipliers) != list:
+            invalid_settings.append("multipliers")
+        if type(self.no_batched_rl) != bool:
+            invalid_settings.append("no_batched_rl")
+        if type(self.predictor_paths) != list:
+            invalid_settings.append("predictor_paths")
+        if type(self.save_path) != str:
+            invalid_settings.append("save_path")
+        if type(self.eval_size) != int:
+            invalid_settings.append("eval_size")
+        if type(self.eval_max_len) != int:
+            invalid_settings.append("eval_max_len")
+        if type(self.temperature) != int:
+            invalid_settings.append("temperature")
+        if type(self.n_embd) != int:
+            invalid_settings.append("n_embd")
+        if type(self.d_model) != int:
+            invalid_settings.append("d_model")
+        if type(self.n_layers) != int:
+            invalid_settings.append("n_layers")
+        if type(self.num_heads) != int:
+            invalid_settings.append("num_heads")
+        if type(self.block_size) != int:
+            invalid_settings.append("block_size")
+        if type(self.proj_size) != int:
+            invalid_settings.append("proj_size")
+        if type(self.attn_dropout_rate) != float:
+            invalid_settings.append("attn_dropout_rate")
+        if type(self.proj_dropout_rate) != float:
+            invalid_settings.append("proj_dropout_rate")
+        if type(self.resid_dropout_rate) != float:
+            invalid_settings.append("resid_dropout_rate")
+        if type(self.predictor_dataset_path) != str:
+            invalid_settings.append("predictor_dataset_path")
+        if type(self.predictor_tokenizer_path) != str:
+            invalid_settings.append("predictor_tokenizer_path")
+        if type(self.predictor_save_path) != str:
+            invalid_settings.append("predictor_save_path")
+        if type(self.train_predictor) != bool:
+            invalid_settings.append("train_predictor")
+        if type(self.predictor_batch_size) != int:
+            invalid_settings.append("predictor_batch_size")
+        if type(self.predictor_epochs) != int:
+            invalid_settings.append("predictor_epochs")
+        if type(self.predictor_n_embd) != int:
+            invalid_settings.append("predictor_n_embd")
+        if type(self.predictor_d_model) != int:
+            invalid_settings.append("predictor_d_model")
+        if type(self.predictor_n_layers) != int:
+            invalid_settings.append("predictor_n_layers")
+        if type(self.predictor_num_heads) != int:
+            invalid_settings.append("predictor_num_heads")
+        if type(self.predictor_block_size) != int:
+            invalid_settings.append("predictor_block_size")
+        if type(self.predictor_proj_size) != int:
+            invalid_settings.append("predictor_proj_size")
+        if type(self.predictor_attn_dropout_rate) != float:
+            invalid_settings.append("predictor_attn_dropout_rate")
+        if type(self.predictor_proj_dropout_rate) != float:
+            invalid_settings.append("predictor_proj_dropout_rate")
+        if type(self.predictor_resid_dropout_rate) != float:
+            invalid_settings.append("predictor_resid_dropout_rate")
+        if type(self.dataset_path) != str:
+            invalid_settings.append("dataset_path")
+        if type(self.tokenizer_path) != str:
+            invalid_settings.append("tokenizer_path")
+        if type(self.device) != str :
+            invalid_settings.append("device")
+        if self.model not in ["RECURRENT","GPT","TRANSFORMER"]:
+            invalid_settings.append("model")
+        if type(self.use_scaffold) != bool:
+            invalid_settings.append("use_scaffold")
+        if invalid_settings == []:
             print("Settings validated.")
         else:
-            print("Invalid settings detected.")
+            print("Invalid settings detected:")
+            for i in invalid_settings:
+                print(f"\t{i}")
+            quit()
                      

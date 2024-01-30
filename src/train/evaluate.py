@@ -17,7 +17,7 @@ import seaborn as sns
 import torch
 from tqdm import trange, tqdm
 
-from ..utils.metrics import calc_qed, calc_sas, calc_diversity, calc_novelty, calc_valid_molecules, calc_num_rings
+from ..utils.metrics import calc_sas, calc_diversity, calc_novelty, calc_valid_molecules, calc_num_rings
 from ..utils.utils import generate_and_save_plot, sample
 from ..utils.mol_utils import convert_to_molecules, filter_invalid_molecules
 

@@ -17,7 +17,8 @@ from src.train.evaluate import generate_smiles, generate_smiles_scaffolds, get_s
 from src.train.reinforcement import policy_gradients
 from src.utils.reward_fn import get_reward_fn
 from src.utils.utils import get_max_smiles_len
-from src.utils.utils import parse_arguments
+# from src.utils.utils import parse_arguments
+from src.utils.inputfilehandler import Arguments
 
 torch.autograd.set_detect_anomaly(True)
 
@@ -30,8 +31,12 @@ torch.autograd.set_detect_anomaly(True)
 
 
 if __name__ == "__main__":  # removed def main(): in place of if __name__ == "__main__":, since the latter only called the former.
-    # Collect and parse all CL arguments
-    args = parse_arguments()
+    ### Process input file from CL
+    args = Arguments()
+    args.ReadInputFile(sys.argv[1])
+
+    # ### Collect and parse all CL arguments
+    # args = parse_arguments()
 
     # Process known arguments for errors and logging.
     if args.tokenizer not in ["Char","BPE"]:
@@ -214,4 +219,4 @@ if __name__ == "__main__":  # removed def main(): in place of if __name__ == "__
               folder_name='post_RL',
               run_moses=True,
               reward_fn=reward_fn)
-              reward_fn=reward_fn)
+

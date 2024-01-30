@@ -1,0 +1,56 @@
+##################################### 
+# Input file template for ChromoGen # 
+##################################### 
+batch_size                     256
+epochs                         3
+learning_rate                  0.001
+load_pretrained                True
+do_train                       False
+pretrained_path                ./data/models/gpt_pre_rl_gdb13.pt
+tokenizer                      Char
+rl_batch_size                  500
+rl_epochs                      250
+discount_factor                0.99
+rl_max_len                     150
+rl_size                        250000
+reward_fns                     AbsorptionReward,EmissionReward,QuantumYieldReward
+do_eval                        True
+eval_steps                     25
+rl_temperature                 1
+multipliers                    lambda x: x
+no_batched_rl                  False
+predictor_paths                None
+save_path                      ./data/results/2024_01_30_20_30_36
+eval_size                      25000
+eval_max_len                   150
+temperature                    1
+n_embd                         512
+d_model                        1024
+n_layers                       4
+num_heads                      8
+block_size                     512
+proj_size                      256
+attn_dropout_rate              0.1
+proj_dropout_rate              0.1
+resid_dropout_rate             0.1
+predictor_dataset_path         ./data/csvs/bs1.csv
+predictor_tokenizer_path       ./data/tokenizers/predictor_tokenizer.json
+predictor_save_path            ./data/models/predictor_model.pt
+train_predictor                False
+predictor_batch_size           32
+predictor_epochs               10
+predictor_n_embd               512
+predictor_d_model              1024
+predictor_n_layers             4
+predictor_num_heads            8
+predictor_block_size           512
+predictor_proj_size            256
+predictor_attn_dropout_rate    0.1
+predictor_proj_dropout_rate    0.1
+predictor_resid_dropout_rate   0.1
+dataset_path                   ./data/gdb/gdb13/gdb13.smi
+tokenizer_path                 ./data/tokenizers/gdb13ScaffoldCharTokenizer.json
+device                         cuda
+model                          GPT
+use_scaffold                   False
+log_level                      default

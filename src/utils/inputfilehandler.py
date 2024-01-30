@@ -65,7 +65,8 @@ class Arguments():
         self.device                       = 'cuda'
         self.model                        = "GPT"
         self.use_scaffold                 = False
-        self.log_level                    = "default" # "verbose", "debug"
+        self.log_level                    = "log" # "verbose", "debug"
+        self.logfile_name                 = "logfile.out"
     
     def CreateTemplateFile(self,inputfile):
         with open(inputfile,"w") as f:
@@ -133,7 +134,7 @@ class Arguments():
             invalid_settings.append("do_train")
         if type(self.pretrained_path) != str:
             invalid_settings.append("pretrained_path")
-        if type(self.tokenizer) != str:
+        if self.tokenizer not in ["Char","BPE"]:
             invalid_settings.append("tokenizer")
         if type(self.rl_batch_size) != int:
             invalid_settings.append("rl_batch_size")
@@ -145,8 +146,9 @@ class Arguments():
             invalid_settings.append("rl_max_len")
         if type(self.rl_size) != int:
             invalid_settings.append("rl_size")
-        if type(self.reward_fns) != list:
-            invalid_settings.append("reward_fns")
+        for item in self.reward_fns:
+            if item not in ['QED', 'Sim', 'Anti Cancer', 'LIDI', 'Docking', 'AbsorptionReward', 'EmissionReward', 'QuantumYieldReward']:
+                invalid_settings.append(f"reward_fns - {item}")
         if type(self.do_eval) != bool:
             invalid_settings.append("do_eval")
         if type(self.eval_steps) != int:
@@ -225,6 +227,9 @@ class Arguments():
             invalid_settings.append("model")
         if type(self.use_scaffold) != bool:
             invalid_settings.append("use_scaffold")
+        if self.log_level not in ["log","verbose","debug"]:
+            self.log_level = "debug"
+            print("Log Level setting unrecognized.  Set to DEBUG.")
         if invalid_settings == []:
             print("Settings validated.")
         else:

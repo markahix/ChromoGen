@@ -1,6 +1,6 @@
 from .recurrent import RecurrentConfig, RecurrentModel
 from .gpt import GPTConfig, GPT
-from .transformer import TransformerConfig, Transoformer
+from .transformer import TransformerConfig, Transformer
 # from ..utils.utils import ModelOpt
 
 def get_model(modeltype="RECURRENT", **kwargs):
@@ -9,7 +9,7 @@ def get_model(modeltype="RECURRENT", **kwargs):
 		model = GPT(config)
 	elif modeltype == "TRANSFORMER":
 		config = TransformerConfig(**kwargs)
-		model = Transoformer(config)
+		model = Transformer(config)
 	else:
 		config = RecurrentConfig(**kwargs)
 		model = RecurrentModel(config)

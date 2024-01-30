@@ -17,11 +17,11 @@ from src.train.evaluate import generate_smiles, generate_smiles_scaffolds, get_s
 from src.train.reinforcement import policy_gradients
 from src.utils.reward_fn import get_reward_fn
 from src.utils.utils import get_max_smiles_len
-# from src.utils.utils import parse_arguments
 from src.utils.inputfilehandler import Arguments
 
-torch.autograd.set_detect_anomaly(True)
+# from src.utils.utils import parse_arguments
 
+torch.autograd.set_detect_anomaly(True)
 # set seeds
 # torch.manual_seed(0)
 # np.random.seed(0)
@@ -31,6 +31,7 @@ torch.autograd.set_detect_anomaly(True)
 
 
 if __name__ == "__main__":  # removed def main(): in place of if __name__ == "__main__":, since the latter only called the former.
+    
     ### Process input file from CL
     args = Arguments()
     args.ReadInputFile(sys.argv[1])
@@ -38,22 +39,23 @@ if __name__ == "__main__":  # removed def main(): in place of if __name__ == "__
     # ### Collect and parse all CL arguments
     # args = parse_arguments()
 
-    # Process known arguments for errors and logging.
-    if args.tokenizer not in ["Char","BPE"]:
-        raise ValueError("Tokenizer type not supported")
 
+    ### Generate tokenizer
     if args.tokenizer == "Char":
         tokenizer = CharTokenizer(args.tokenizer_path, args.dataset_path)
 
     elif args.tokenizer == "BPE":
         tokenizer = BPETokenizer(args.tokenizer_path, args.dataset_path, vocab_size=500)
-       
-    print(args.device)
+
+    ### Assign device type.
+    print("Device: ",args.device)
     device = torch.device(args.device)
 
+    ### Calculate maximum SMILES string length.
     max_smiles_len = get_max_smiles_len(args.dataset_path) + 50
     print(f'{max_smiles_len=}')
 
+    ### Generate dataset name from path.
     dataset_name = args.dataset_path[args.dataset_path.rfind('/')+1:args.dataset_path.rfind('.')]
 
     if args.train_predictor:
@@ -92,10 +94,6 @@ if __name__ == "__main__":  # removed def main(): in place of if __name__ == "__
 
         torch.save(predictor_model, args.predictor_save_path)
 
-    print("Device: ",args.device)
-    
-    max_smiles_len = get_max_smiles_len(args.dataset_path) + 50
-    print(f'{max_smiles_len=}')
 
     dataset = get_dataset(data_path=args.dataset_path,
                           tokenizer=tokenizer,
@@ -139,7 +137,7 @@ if __name__ == "__main__":  # removed def main(): in place of if __name__ == "__
                                 f'_Scaffold_{str(args.use_scaffold)}' + \
                                 f'_discount_{str(args.discount_factor)}'
 
-    print(eval_save_path)
+    print(eval_save_path) 
     
     if not args.load_pretrained and args.do_train:
         optim = torch.optim.Adam(model.parameters(), lr=args.learning_rate)

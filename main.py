@@ -17,36 +17,27 @@ from src.train.evaluate import generate_smiles, generate_smiles_scaffolds, get_s
 from src.train.reinforcement import policy_gradients
 from src.utils.reward_fn import get_reward_fn
 from src.utils.utils import get_max_smiles_len
-from src.utils.utils import parse_arguments
+from src.utils.inputfilehandler import Arguments
+
+# from src.utils.utils import parse_arguments
 
 torch.autograd.set_detect_anomaly(True)
+# set seeds
+# torch.manual_seed(0)
+# np.random.seed(0)
+# random.seed(0)
 
-<<<<<<< HEAD
-if __name__ == "__main__":
-    args = parse_arguments()
-    device = torch.device(args.device)
+if __name__ == "__main__":  # removed def main(): in place of if __name__ == "__main__":, since the latter only called the former.
+    
+    ### Process input file from CL
+    args = Arguments()
+    args.ReadInputFile(sys.argv[1])
 
-    ### MAH - START
-    # If a dataset_path is given, checks to ensure the file at that location exists.  If it does not exist, and the desired file is known to use, it is downloaded from Zenodo and decompressed to the proper location.  This will ensure that the specific datasets need not be preinstalled, which will make it more streamlined on newer systems - only download the datasets that are actually being used.
-    if args.dataset_path:        
-        if not os.path.exists(args.dataset_path):
-            dataset_dirname = os.path.dirname(args.dataset_path)
-            dataset_filename = args.dataset_path.split("/")[-1]
-            _currdir=os.getcwd()
-            dataset_urls = {
-                "gdb13.smi":"https://zenodo.org/record/5172018/files/gdb13.tgz",
-                "GDB13_Subset-AB.smi":"https://zenodo.org/record/5172018/files/GDB13_Subset-AB.smi.gz",
-                "gdb13.1M.freq.ll.smi":"https://zenodo.org/record/5172018/files/gdb13.1M.freq.ll.smi.gz",
-            }
-            print(f"{args.dataset_path} dataset missing.")
-            if dataset_filename in [x for x in dataset_urls.keys()]:
-                os.chdir(dataset_dirname)
-                os.system(f"wget {dataset_urls[dataset_filename]} && gzip -d {dataset_filename}.gz")
-                os.chdir(_currdir)
-            else:
-                print("Unable to obtain dataset automatically.")
+    # ### Collect and parse all CL arguments
+    # args = parse_arguments()
 
-    ### moved this if-elif-else block above args.train_predictor check, as 'tokenizer' must be defined before being used by the internals of train_predictor.
+
+    ### Generate tokenizer
     if args.tokenizer == "Char":
         tokenizer = CharTokenizer(args.tokenizer_path, args.dataset_path)
 
@@ -57,38 +48,17 @@ if __name__ == "__main__":
         raise ValueError("Tokenizer type not supported")
     ### MAH - END
                 
-=======
-# set seeds
-# torch.manual_seed(0)
-# np.random.seed(0)
-# random.seed(0)
-
-### Considering adding a debug/logfile options instead of printing?  Or check for verbosity argument and print-if-verbose?
-
-
-if __name__ == "__main__":  # removed def main(): in place of if __name__ == "__main__":, since the latter only called the former.
-    # Collect and parse all CL arguments
-    args = parse_arguments()
-
-    # Process known arguments for errors and logging.
-    if args.tokenizer not in ["Char","BPE"]:
-        raise ValueError("Tokenizer type not supported")
-
-    if args.tokenizer == "Char":
-        tokenizer = CharTokenizer(args.tokenizer_path, args.dataset_path)
-
-    elif args.tokenizer == "BPE":
-        tokenizer = BPETokenizer(args.tokenizer_path, args.dataset_path, vocab_size=500)
-       
-    print(args.device)
+    ### Assign device type.
+    print("Device: ",args.device)
     device = torch.device(args.device)
 
+    ### Calculate maximum SMILES string length.
     max_smiles_len = get_max_smiles_len(args.dataset_path) + 50
     print(f'{max_smiles_len=}')
 
+    ### Generate dataset name from path.
     dataset_name = args.dataset_path[args.dataset_path.rfind('/')+1:args.dataset_path.rfind('.')]
 
->>>>>>> 103b1d3 (update to commenting and cleanup)
     if args.train_predictor:
         train, test = train_test_split(pd.read_csv(args.predictor_dataset_path), test_size=0.2, random_state=42, shuffle=True) ### This function comes from sklearn, no messing with it.
 
@@ -96,12 +66,7 @@ if __name__ == "__main__":  # removed def main(): in place of if __name__ == "__
         train.reset_index(inplace=True)
         test.reset_index(inplace=True)
 
-<<<<<<< HEAD
         predictor_tokenizer = CharTokenizer(args.predictor_tokenizer_path, data_path='./data/ic50_smiles.smi')
-=======
-        predictor_tokenizer = CharTokenizer(args.predictor_tokenizer_path,
-                                            data_path='./data/ic50_smiles.smi')
->>>>>>> 103b1d3 (update to commenting and cleanup)
 
         train_dataset = BS1Dataset(train, predictor_tokenizer)
         test_dataset = BS1Dataset(test, predictor_tokenizer)
@@ -130,14 +95,6 @@ if __name__ == "__main__":  # removed def main(): in place of if __name__ == "__
 
         torch.save(predictor_model, args.predictor_save_path)
 
-<<<<<<< HEAD
-    print("Device: ",args.device)
-    
-    max_smiles_len = get_max_smiles_len(args.dataset_path) + 50
-    print(f'{max_smiles_len=}')
-
-=======
->>>>>>> 103b1d3 (update to commenting and cleanup)
     dataset = get_dataset(data_path=args.dataset_path,
                           tokenizer=tokenizer,
                           use_scaffold=args.use_scaffold,
@@ -180,7 +137,7 @@ if __name__ == "__main__":  # removed def main(): in place of if __name__ == "__
                                 f'_Scaffold_{str(args.use_scaffold)}' + \
                                 f'_discount_{str(args.discount_factor)}'
 
-    print(eval_save_path)
+    print(eval_save_path) 
     
     if not args.load_pretrained and args.do_train:
         optim = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
@@ -259,9 +216,5 @@ if __name__ == "__main__":  # removed def main(): in place of if __name__ == "__
               save_path=eval_save_path,
               folder_name='post_RL',
               run_moses=True,
-<<<<<<< HEAD
               reward_fn=reward_fn)
 
-=======
-              reward_fn=reward_fn)
->>>>>>> 103b1d3 (update to commenting and cleanup)

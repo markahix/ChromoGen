@@ -17,7 +17,7 @@ class TransformerConfig():
                 proj_dropout_rate=0.1,
                 resid_dropout_rate=0.1,
                 embd_dropout_rate=0.1,
-                **kwargs
+                **kwargs  ## if passing kwargs, should process and use kwargs.  otherwise, remove.
                 ) -> None:
         self.vocab_size = vocab_size
         self.block_size = block_size
@@ -31,10 +31,9 @@ class TransformerConfig():
         self.resid_dropout_rate = resid_dropout_rate
         self.embd_dropout_rate = embd_dropout_rate
 
-class Transoformer(nn.Module):
-
+class Transformer(nn.Module):
     def __init__(self, config: TransformerConfig):
-        super(Transoformer, self).__init__()
+        super(Transformer, self).__init__()
 
         self.encoder = Encoder(config)
         self.decoder = Decoder(config)

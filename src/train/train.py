@@ -9,7 +9,6 @@ class Trainer():
         self.optim = optim
         self.criterion = criterion
 
-
     def train(self, epochs, batch_size, device):
         print(f'Train {device}')
         dataloader = torch.utils.data.DataLoader(self.dataset,

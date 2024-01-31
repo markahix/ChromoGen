@@ -1,25 +1,17 @@
 from .recurrent import RecurrentConfig, RecurrentModel
 from .gpt import GPTConfig, GPT
-from .transformer import TransformerConfig, Transoformer
-from ..utils.utils import ModelOpt
+from .transformer import TransformerConfig, Transformer
+# from ..utils.utils import ModelOpt
 
-def get_model(type=ModelOpt.RECURRENT, **kwargs):
-
-	print(type)
-	if type == ModelOpt.RECURRENT:
-		config = RecurrentConfig(**kwargs)
-		model = RecurrentModel(config)
-	
-	elif type == ModelOpt.GPT:
+def get_model(modeltype="RECURRENT", **kwargs):
+	if modeltype == "GPT":
 		config = GPTConfig(**kwargs)
 		model = GPT(config)
-
-	elif type == ModelOpt.TRANSFORMER:
+	elif modeltype == "TRANSFORMER":
 		config = TransformerConfig(**kwargs)
-		model = Transoformer(config)
-
+		model = Transformer(config)
 	else:
-		raise ValueError("Invalid choice")
-
+		config = RecurrentConfig(**kwargs)
+		model = RecurrentModel(config)
 	return model
 	
